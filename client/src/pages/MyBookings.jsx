@@ -13,6 +13,9 @@ const MyBookings = () => {
   const [reviewData, setReviewData] = useState({});
   const [showReviewForm, setShowReviewForm] = useState({});
   const [filterStatus, setFilterStatus] = useState('all');
+  const [confirmCancelId, setConfirmCancelId] = useState(null);
+  // map of eventId -> true/false whether user already reviewed
+  const [reviewedEvents, setReviewedEvents] = useState({});
   const { toasts, removeToast, success, error } = useToast();
 
   useEffect(() => {
@@ -24,6 +27,25 @@ const MyBookings = () => {
       const { data } = await api.get('/bookings/my-bookings');
       const validBookings = data.filter(booking => booking.event && booking.event._id);
       setBookings(validBookings);
+
+      // Check which past events the user has already reviewed
+      const pastBookings = validBookings.filter(
+        b => b.status === 'confirmed' && new Date(b.event.date) < new Date()
+      );
+      const reviewChecks = await Promise.all(
+        pastBookings.map(b =>
+          api.get(`/reviews/event/${b.event._id}`)
+            .then(({ data: rd }) => ({
+              eventId: b.event._id,
+              reviewed: rd.reviews.some(r => r.user._id === user._id || r.user === user._id)
+            }))
+            .catch(() => ({ eventId: b.event._id, reviewed: false }))
+        )
+      );
+      const map = {};
+      reviewChecks.forEach(({ eventId, reviewed }) => { map[eventId] = reviewed; });
+      setReviewedEvents(map);
+
       setLoading(false);
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -31,15 +53,15 @@ const MyBookings = () => {
     }
   };
 
-  const handleCancel = async (id) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
-      try {
-        await api.delete(`/bookings/${id}`);
-        success('Booking cancelled successfully!');
-        fetchBookings();
-      } catch (err) {
-        error('Failed to cancel booking. Please try again.');
-      }
+  const handleCancel = async () => {
+    if (!confirmCancelId) return;
+    try {
+      await api.delete(`/bookings/${confirmCancelId}`);
+      success('Booking cancelled successfully');
+      setConfirmCancelId(null);
+      fetchBookings();
+    } catch (err) {
+      error('Failed to cancel booking. Please try again.');
     }
   };
 
@@ -56,14 +78,15 @@ const MyBookings = () => {
     }
 
     try {
-      await api.post(`/events/${eventId}/reviews`, {
+      await api.post('/reviews', {
+        eventId,
         rating: review.rating,
         comment: review.comment
       });
       success('Review submitted successfully!');
       setShowReviewForm({ ...showReviewForm, [bookingId]: false });
       setReviewData({ ...reviewData, [bookingId]: { rating: 0, comment: '' } });
-      fetchBookings();
+      setReviewedEvents({ ...reviewedEvents, [eventId]: true });
     } catch (err) {
       error(err.response?.data?.message || 'Failed to submit review');
     }
@@ -94,12 +117,7 @@ const MyBookings = () => {
     return new Date(eventDate) < new Date();
   };
 
-  const hasUserReviewed = (event) => {
-    if (!event || !event.reviews) return false;
-    return event.reviews.some(review => 
-      review.user?._id === user.id || review.user === user.id
-    );
-  };
+  const hasUserReviewed = (eventId) => !!reviewedEvents[eventId];
 
   const getFilteredBookings = () => {
     if (filterStatus === 'all') return bookings;
@@ -133,8 +151,7 @@ const MyBookings = () => {
 
   return (
     <>
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <ToastContainer toasts={toasts} removeToast={removeToast} />      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
       
       <div className="container mx-auto px-4">
         {/* Header Section */}
@@ -327,7 +344,7 @@ const MyBookings = () => {
                     
                     {booking.status === 'confirmed' && !isPastEvent(booking.event.date) && (
                       <button
-                        onClick={() => handleCancel(booking._id)}
+                        onClick={() => setConfirmCancelId(booking._id)}
                         className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-red-300 text-red-600 rounded-xl font-semibold hover:bg-red-50 transition-colors"
                       >
                         <FaTimesCircle />
@@ -335,7 +352,7 @@ const MyBookings = () => {
                       </button>
                     )}
 
-                    {booking.status === 'confirmed' && isPastEvent(booking.event.date) && !hasUserReviewed(booking.event) && (
+                    {booking.status === 'confirmed' && isPastEvent(booking.event.date) && !hasUserReviewed(booking.event._id) && (
                       <button
                         onClick={() => toggleReviewForm(booking._id)}
                         className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-colors"
@@ -349,7 +366,7 @@ const MyBookings = () => {
                   {/* Review Section */}
                   {booking.status === 'confirmed' && isPastEvent(booking.event.date) && (
                     <div className="mt-6 pt-6 border-t border-gray-200">
-                      {hasUserReviewed(booking.event) ? (
+                      {hasUserReviewed(booking.event._id) ? (
                         <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
                           <div className="flex items-center gap-3 mb-4">
                             <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -360,17 +377,6 @@ const MyBookings = () => {
                               <p className="text-sm text-green-700">Thank you for sharing your experience!</p>
                             </div>
                           </div>
-                          {booking.event.reviews?.filter(r => r.user?._id === user.id || r.user === user.id).map((review, idx) => (
-                            <div key={idx} className="bg-white rounded-lg p-4 border border-green-200">
-                              <div className="flex items-center gap-1 mb-2">
-                                {[...Array(5)].map((_, i) => (
-                                  <FaStar key={i} className={`${i < review.rating ? 'text-amber-400' : 'text-gray-300'}`} />
-                                ))}
-                                <span className="ml-2 text-gray-900 font-semibold">{review.rating}/5</span>
-                              </div>
-                              <p className="text-gray-700 text-sm leading-relaxed">{review.comment}</p>
-                            </div>
-                          ))}
                         </div>
                       ) : showReviewForm[booking._id] ? (
                         <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6">
@@ -469,6 +475,31 @@ const MyBookings = () => {
         )}
       </div>
     </div>
+
+      {/* Cancel Booking Confirm Modal */}
+      {confirmCancelId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md">
+            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaTimesCircle className="text-red-600 text-xl" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">Cancel Booking?</h3>
+            <p className="text-gray-500 text-center text-sm mb-6">
+              Your tickets will be released and this action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={handleCancel}
+                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 flex items-center justify-center gap-2">
+                <FaTimesCircle /> Yes, Cancel
+              </button>
+              <button onClick={() => setConfirmCancelId(null)}
+                className="flex-1 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:border-gray-400">
+                Keep Booking
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

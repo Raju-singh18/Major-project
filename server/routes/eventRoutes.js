@@ -7,7 +7,8 @@ import {
   deleteEvent,
   getMyEvents,
   getEventStats,
-  getTrendingEvents
+  getTrendingEvents,
+  getPastEvents
 } from '../controllers/eventController.js';
 import { protect, organizer } from '../middleware/authMiddleware.js';
 
@@ -16,6 +17,7 @@ const router = express.Router();
 // Public routes
 router.get('/stats', getEventStats);
 router.get('/trending', getTrendingEvents);
+router.get('/past', getPastEvents);
 router.get('/featured', getEvents);
 
 // Main routes

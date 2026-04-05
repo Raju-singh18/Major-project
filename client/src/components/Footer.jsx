@@ -132,7 +132,7 @@ const Footer = () => {
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Phone</div>
                   <a href="tel:+1234567890" className="hover:text-purple-600 transition-colors font-medium">
-                    +1 (234) 567-8900
+                    +91 1261651156
                   </a>
                 </div>
               </li>
@@ -142,7 +142,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500 mb-1">Address</div>
-                  <span className="font-medium">New York, NY 10001</span>
+                  <span className="font-medium">MMMUT, GORAKHPUR 273010</span>
                 </div>
               </li>
             </ul>

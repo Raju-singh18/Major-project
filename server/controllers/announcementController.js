@@ -1,7 +1,10 @@
 import Announcement from '../models/Announcement.js';
 import Event from '../models/Event.js';
 import Booking from '../models/Booking.js';
+import User from '../models/User.js';
 import { createNotification } from '../utils/notificationHelper.js';
+import { sendEmail } from '../utils/sendEmail.js';
+import { announcementEmailTemplate } from '../utils/emailTemplates.js';
 
 export const sendAnnouncement = async (req, res) => {
   try {
@@ -29,15 +32,21 @@ export const sendAnnouncement = async (req, res) => {
       sentTo: bookings
     });
 
-    for (const userId of bookings) {
-      await createNotification(
-        userId,
-        'event_update',
-        `Announcement: ${title}`,
-        message,
-        eventId
-      );
-    }
+    // Send in-app notifications + emails to all attendees
+    const attendees = await User.find({ _id: { $in: bookings } }).select('name email');
+
+    await Promise.all(bookings.map(userId =>
+      createNotification(userId, 'event_update', `Announcement: ${title}`, message, eventId)
+    ));
+
+    // Fire-and-forget emails — don't block the response
+    attendees.forEach(attendee => {
+      sendEmail({
+        email: attendee.email,
+        subject: `📢 ${title} – ${event.title}`,
+        html: announcementEmailTemplate(attendee.name, event, title, message)
+      }).catch(err => console.error(`Announcement email failed for ${attendee.email}:`, err));
+    });
 
     res.status(201).json({
       message: `Announcement sent to ${bookings.length} attendees`,

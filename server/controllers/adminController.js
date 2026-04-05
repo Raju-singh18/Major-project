@@ -3,6 +3,13 @@ import Event from '../models/Event.js';
 import Booking from '../models/Booking.js';
 import Review from '../models/Review.js';
 import { createNotification } from '../utils/notificationHelper.js';
+import { sendEmail } from '../utils/sendEmail.js';
+import {
+  accountSuspendedEmailTemplate,
+  accountReactivatedEmailTemplate,
+  eventApprovedEmailTemplate,
+  eventRejectedEmailTemplate
+} from '../utils/emailTemplates.js';
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -130,6 +137,8 @@ export const approveEvent = async (req, res) => {
     event.status = 'published';
     await event.save();
 
+    const organizer = await User.findById(event.organizer).select('name email');
+
     await createNotification(
       event.organizer,
       'event_update',
@@ -137,6 +146,12 @@ export const approveEvent = async (req, res) => {
       `Your event "${event.title}" has been approved and is now published.`,
       event._id
     );
+
+    sendEmail({
+      email: organizer.email,
+      subject: `✅ Your event "${event.title}" is now live!`,
+      html: eventApprovedEmailTemplate(organizer.name, event)
+    }).catch(err => console.error('Event approved email error:', err));
 
     res.json({ message: 'Event approved', event });
   } catch (error) {
@@ -156,6 +171,8 @@ export const rejectEvent = async (req, res) => {
     event.status = 'cancelled';
     await event.save();
 
+    const organizer = await User.findById(event.organizer).select('name email');
+
     await createNotification(
       event.organizer,
       'event_update',
@@ -163,6 +180,12 @@ export const rejectEvent = async (req, res) => {
       `Your event "${event.title}" has been rejected. Reason: ${reason || 'No reason provided'}`,
       event._id
     );
+
+    sendEmail({
+      email: organizer.email,
+      subject: `❌ Your event "${event.title}" was not approved`,
+      html: eventRejectedEmailTemplate(organizer.name, event, reason)
+    }).catch(err => console.error('Event rejected email error:', err));
 
     res.json({ message: 'Event rejected', event });
   } catch (error) {
@@ -237,6 +260,12 @@ export const suspendUser = async (req, res) => {
       'Your account has been suspended. Please contact support for more information.'
     );
 
+    sendEmail({
+      email: user.email,
+      subject: '🚫 Your EventMe account has been suspended',
+      html: accountSuspendedEmailTemplate(user.name)
+    }).catch(err => console.error('Suspension email error:', err));
+
     res.json({ message: 'User suspended', user });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -260,6 +289,12 @@ export const unsuspendUser = async (req, res) => {
       'Account Reactivated',
       'Your account has been reactivated. You can now access all features.'
     );
+
+    sendEmail({
+      email: user.email,
+      subject: '✅ Your EventMe account has been reactivated',
+      html: accountReactivatedEmailTemplate(user.name)
+    }).catch(err => console.error('Reactivation email error:', err));
 
     res.json({ message: 'User unsuspended', user });
   } catch (error) {

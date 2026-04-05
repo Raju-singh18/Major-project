@@ -6,8 +6,8 @@ import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
 import {
   FaMapMarkerAlt, FaCalendar, FaClock, FaUser, FaTicketAlt,
-  FaArrowLeft, FaCheckCircle, FaHeart, FaRegHeart, FaShare,
-  FaUsers, FaTag
+  FaArrowLeft, FaCheckCircle, FaHeart, FaRegHeart,
+  FaUsers, FaStar, FaBan, FaHistory
 } from 'react-icons/fa';
 import ReviewSection from '../components/ReviewSection';
 
@@ -187,6 +187,21 @@ const EventDetails = () => {
     ? Math.round(((event.totalSeats - event.availableSeats) / event.totalSeats) * 100)
     : 0;
 
+  const now = new Date();
+  const eventDateTime = new Date(event.date);
+  // parse event.time e.g. "18:30" and apply to the date
+  if (event.time) {
+    const [h, m] = event.time.split(':');
+    eventDateTime.setHours(parseInt(h, 10), parseInt(m, 10), 0, 0);
+  }
+  const bookingCutoff = new Date(eventDateTime.getTime() - 2 * 60 * 60 * 1000); // 2h before
+
+  const isEventPast     = now > eventDateTime;
+  const isBookingClosed = !isEventPast && now > bookingCutoff; // within 2h window
+  const isSoldOut       = event.availableSeats === 0;
+  const isCancelled     = event.status === 'cancelled';
+  const canBook         = !isEventPast && !isBookingClosed && !isSoldOut && !isCancelled;
+
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
@@ -300,13 +315,13 @@ const EventDetails = () => {
               </div>
 
               {/* Reviews */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6">
-                <ReviewSection eventId={event._id} />
+              <div id="reviews-section" className="bg-white border border-gray-200 rounded-2xl p-6">
+                <ReviewSection eventId={event._id} eventDate={event.date} />
               </div>
 
               {/* Related Events */}
               {relatedEvents.length > 0 && (
-                <div className="bg-white border border-gray-200 rounded-2xl p-6">
+                <div id="similar-events" className="bg-white border border-gray-200 rounded-2xl p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-5" style={{ fontFamily: 'Poppins, sans-serif' }}>Similar Events</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {relatedEvents.map((rel) => (
@@ -335,132 +350,250 @@ const EventDetails = () => {
             {/* Right — Booking Card */}
             <div className="lg:col-span-1">
               <div className="bg-white border border-gray-200 rounded-2xl p-6 sticky top-20">
-                <h2 className="text-xl font-bold text-gray-900 mb-5" style={{ fontFamily: 'Poppins, sans-serif' }}>Book Tickets</h2>
 
-                {/* Ticket types */}
-                <div className="space-y-3 mb-5">
-                  {event.ticketTypes.map((ticket) => {
-                    const available = ticket.quantity - ticket.sold;
-                    const isAvailable = available > 0;
-                    const qty = tickets[ticket.name] || 0;
-
-                    return (
-                      <div key={ticket.name} className={`border rounded-xl p-4 ${isAvailable ? 'border-gray-200' : 'border-gray-100 bg-gray-50 opacity-60'}`}>
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <p className="font-bold text-gray-900">{ticket.name}</p>
-                            <p className={`text-xs font-medium mt-0.5 ${isAvailable ? 'text-green-600' : 'text-red-500'}`}>
-                              {isAvailable ? `${available} available` : 'Sold Out'}
-                            </p>
-                          </div>
-                          <span className="text-xl font-bold text-purple-600">${ticket.price}</span>
-                        </div>
-
-                        {isAvailable && (
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setTickets({ ...tickets, [ticket.name]: Math.max(0, qty - 1) })}
-                              className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 flex items-center justify-center"
-                            >−</button>
-                            <span className="w-8 text-center font-bold text-gray-900">{qty}</span>
-                            <button
-                              onClick={() => setTickets({ ...tickets, [ticket.name]: Math.min(available, qty + 1) })}
-                              className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 flex items-center justify-center"
-                            >+</button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Order summary */}
-                {totalTickets > 0 && (
-                  <div className="border-t border-gray-100 pt-4 mb-5 space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>{totalTickets} ticket{totalTickets > 1 ? 's' : ''}</span>
-                      <span>${totalAmount.toFixed(2)}</span>
+                {/* ── Event Ended ─────────────────────────────────────── */}
+                {isEventPast && (
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaHistory className="text-gray-400 text-2xl" />
                     </div>
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Service fee</span>
-                      <span>$0.00</span>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">This Event Has Ended</h3>
+                    <p className="text-sm text-gray-500 mb-5">
+                      Took place on {new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </p>
+                    <div className="space-y-3">
+                      <a
+                        href="#reviews"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.querySelector('#reviews-section')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all"
+                      >
+                        <FaStar /> Read Reviews
+                      </a>
+                      {relatedEvents.length > 0 && (
+                        <a
+                          href="#similar"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            document.querySelector('#similar-events')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                        >
+                          <FaCalendar /> Browse Similar Events
+                        </a>
+                      )}
+                      <Link
+                        to="/events"
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-purple-200 text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-all"
+                      >
+                        Explore Upcoming Events
+                      </Link>
                     </div>
-                    <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100">
-                      <span>Total</span>
-                      <span className="text-purple-600 text-lg">${totalAmount.toFixed(2)}</span>
+                    <div className="mt-5 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center">
+                      Attended this event? Leave a review below ↓
                     </div>
                   </div>
                 )}
 
-                {/* Suspended warning */}
-                {user?.suspended && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm flex items-start gap-2">
-                    <span className="text-base">🚫</span>
-                    <div>
-                      <p className="font-bold">Account Suspended</p>
-                      <p className="text-xs mt-0.5">You cannot book events at this time.</p>
+                {/* ── Cancelled ───────────────────────────────────────── */}
+                {!isEventPast && isCancelled && (
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaBan className="text-red-500 text-2xl" />
                     </div>
-                  </div>
-                )}
-
-                {/* Payment note */}
-                {!user?.suspended && totalTickets > 0 && (
-                  <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl mb-4 text-xs">
-                    <p className="font-semibold mb-1">💳 Accepted: UPI · Net Banking · Indian Cards</p>
-                    <p className="text-blue-600">⚠️ International cards not supported</p>
-                  </div>
-                )}
-
-                {/* Book button */}
-                <button
-                  onClick={handleBooking}
-                  disabled={totalTickets === 0 || bookingLoading || user?.suspended}
-                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {bookingLoading ? (
-                    <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Processing...</>
-                  ) : user?.suspended ? '🚫 Account Suspended'
-                    : totalTickets === 0 ? 'Select Tickets'
-                    : <><FaTicketAlt /> Book {totalTickets} Ticket{totalTickets > 1 ? 's' : ''}</>
-                  }
-                </button>
-
-                {/* Test payment fallback */}
-                {showMockPayment && user && !user.suspended && totalTickets > 0 && (
-                  <div className="mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4">
-                    <p className="text-sm font-bold text-orange-800 mb-1">⚠️ Razorpay Payment Failed</p>
-                    <p className="text-xs text-orange-700 mb-3">Use Test Payment mode for development.</p>
-                    <button
-                      onClick={() => {
-                        setBookingLoading(true);
-                        const bt = Object.entries(tickets)
-                          .filter(([_, q]) => q > 0)
-                          .map(([ticketType, quantity]) => ({
-                            ticketType, quantity,
-                            price: event.ticketTypes.find(t => t.name === ticketType).price
-                          }));
-                        handleMockPayment(bt);
-                      }}
-                      disabled={bookingLoading}
-                      className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">Event Cancelled</h3>
+                    <p className="text-sm text-gray-500 mb-5">This event has been cancelled by the organizer. If you booked tickets, you will receive a full refund.</p>
+                    <Link
+                      to="/events"
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold"
                     >
-                      {bookingLoading
-                        ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Processing...</>
-                        : '🧪 Use Test Payment (Dev Mode)'
+                      Browse Other Events
+                    </Link>
+                  </div>
+                )}
+
+                {/* ── Booking Closed (within 2h of start) ─────────────── */}
+                {!isEventPast && !isCancelled && isBookingClosed && (
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaClock className="text-orange-500 text-2xl" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">Booking Closed</h3>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Online ticket sales close 2 hours before the event starts.
+                    </p>
+                    <p className="text-xs text-orange-600 font-semibold bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 mb-5">
+                      🎟️ Tickets may still be available at the venue
+                    </p>
+                    <div className="space-y-2 text-left text-sm text-gray-600 bg-gray-50 rounded-xl p-4 mb-5">
+                      <p className="font-semibold text-gray-800 mb-2">Venue Details</p>
+                      <p>📍 {event.location.venue}</p>
+                      <p>🏙️ {event.location.address}, {event.location.city}</p>
+                      <p>🕐 Starts at {event.time}</p>
+                    </div>
+                    <Link to="/events" className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50">
+                      Browse Other Events
+                    </Link>
+                  </div>
+                )}
+
+                {/* ── Sold Out ─────────────────────────────────────────── */}
+                {!isEventPast && !isCancelled && !isBookingClosed && isSoldOut && (
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FaTicketAlt className="text-red-500 text-2xl" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">Sold Out</h3>
+                    <p className="text-sm text-gray-500 mb-5">All tickets for this event have been sold. Add to wishlist to stay updated if tickets become available.</p>
+                    {user && (
+                      <button
+                        onClick={handleWishlistToggle}
+                        disabled={wishlistLoading}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold mb-3 hover:from-pink-600 hover:to-rose-600 transition-all"
+                      >
+                        {isInWishlist ? <FaHeart /> : <FaRegHeart />}
+                        {isInWishlist ? 'Saved to Wishlist' : 'Save to Wishlist'}
+                      </button>
+                    )}
+                    <Link to="/events" className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50">
+                      Browse Similar Events
+                    </Link>
+                  </div>
+                )}
+
+                {/* ── Normal Booking Flow ──────────────────────────────── */}
+                {canBook && (
+                  <>
+                    <h2 className="text-xl font-bold text-gray-900 mb-5" style={{ fontFamily: 'Poppins, sans-serif' }}>Book Tickets</h2>
+
+                    {/* Urgency nudge */}
+                    {soldPct >= 80 && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg mb-4 text-xs font-semibold flex items-center gap-2">
+                        🔥 Only {event.availableSeats} seats left — selling fast!
+                      </div>
+                    )}
+
+                    {/* Ticket types */}
+                    <div className="space-y-3 mb-5">
+                      {event.ticketTypes.map((ticket) => {
+                        const available = ticket.quantity - ticket.sold;
+                        const isAvailable = available > 0;
+                        const qty = tickets[ticket.name] || 0;
+                        return (
+                          <div key={ticket.name} className={`border rounded-xl p-4 ${isAvailable ? 'border-gray-200' : 'border-gray-100 bg-gray-50 opacity-60'}`}>
+                            <div className="flex items-center justify-between mb-3">
+                              <div>
+                                <p className="font-bold text-gray-900">{ticket.name}</p>
+                                <p className={`text-xs font-medium mt-0.5 ${isAvailable ? 'text-green-600' : 'text-red-500'}`}>
+                                  {isAvailable ? `${available} available` : 'Sold Out'}
+                                </p>
+                              </div>
+                              <span className="text-xl font-bold text-purple-600">${ticket.price}</span>
+                            </div>
+                            {isAvailable && (
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => setTickets({ ...tickets, [ticket.name]: Math.max(0, qty - 1) })} className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 flex items-center justify-center">−</button>
+                                <span className="w-8 text-center font-bold text-gray-900">{qty}</span>
+                                <button onClick={() => setTickets({ ...tickets, [ticket.name]: Math.min(available, qty + 1) })} className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-gray-700 flex items-center justify-center">+</button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Order summary */}
+                    {totalTickets > 0 && (
+                      <div className="border-t border-gray-100 pt-4 mb-5 space-y-2">
+                        <div className="flex justify-between text-sm text-gray-600">
+                          <span>{totalTickets} ticket{totalTickets > 1 ? 's' : ''}</span>
+                          <span>${totalAmount.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-gray-600">
+                          <span>Service fee</span>
+                          <span>$0.00</span>
+                        </div>
+                        <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100">
+                          <span>Total</span>
+                          <span className="text-purple-600 text-lg">${totalAmount.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Suspended warning */}
+                    {user?.suspended && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm flex items-start gap-2">
+                        <span className="text-base">🚫</span>
+                        <div>
+                          <p className="font-bold">Account Suspended</p>
+                          <p className="text-xs mt-0.5">You cannot book events at this time.</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Payment note */}
+                    {!user?.suspended && totalTickets > 0 && (
+                      <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl mb-4 text-xs">
+                        <p className="font-semibold mb-1">💳 Accepted: UPI · Net Banking · Indian Cards</p>
+                        <p className="text-blue-600">⚠️ International cards not supported</p>
+                      </div>
+                    )}
+
+                    {/* Book button */}
+                    <button
+                      onClick={handleBooking}
+                      disabled={totalTickets === 0 || bookingLoading || user?.suspended}
+                      className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {bookingLoading ? (
+                        <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Processing...</>
+                      ) : user?.suspended ? '🚫 Account Suspended'
+                        : totalTickets === 0 ? 'Select Tickets'
+                        : <><FaTicketAlt /> Book {totalTickets} Ticket{totalTickets > 1 ? 's' : ''}</>
                       }
                     </button>
-                  </div>
+
+                    {/* Test payment fallback */}
+                    {showMockPayment && user && !user.suspended && totalTickets > 0 && (
+                      <div className="mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4">
+                        <p className="text-sm font-bold text-orange-800 mb-1">⚠️ Razorpay Payment Failed</p>
+                        <p className="text-xs text-orange-700 mb-3">Use Test Payment mode for development.</p>
+                        <button
+                          onClick={() => {
+                            setBookingLoading(true);
+                            const bt = Object.entries(tickets)
+                              .filter(([_, q]) => q > 0)
+                              .map(([ticketType, quantity]) => ({
+                                ticketType, quantity,
+                                price: event.ticketTypes.find(t => t.name === ticketType).price
+                              }));
+                            handleMockPayment(bt);
+                          }}
+                          disabled={bookingLoading}
+                          className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          {bookingLoading
+                            ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Processing...</>
+                            : '🧪 Use Test Payment (Dev Mode)'
+                          }
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Trust indicators */}
+                    <div className="mt-5 pt-4 border-t border-gray-100 space-y-2">
+                      {['Secure payment processing', 'Instant ticket delivery', '24/7 customer support'].map(t => (
+                        <div key={t} className="flex items-center gap-2 text-xs text-gray-500">
+                          <FaCheckCircle className="text-green-500 flex-shrink-0" />
+                          {t}
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
 
-                {/* Trust indicators */}
-                <div className="mt-5 pt-4 border-t border-gray-100 space-y-2">
-                  {['Secure payment processing', 'Instant ticket delivery', '24/7 customer support'].map(t => (
-                    <div key={t} className="flex items-center gap-2 text-xs text-gray-500">
-                      <FaCheckCircle className="text-green-500 flex-shrink-0" />
-                      {t}
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
 

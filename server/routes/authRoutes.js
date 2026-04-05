@@ -7,7 +7,8 @@ import {
   verifyEmail,
   resendVerificationEmail,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  deleteAccount
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -22,5 +23,6 @@ router.post('/reset-password/:token', resetPassword);
 router.route('/profile')
   .get(protect, getProfile)
   .put(protect, updateProfile);
+router.delete('/account', protect, deleteAccount);
      
 export default router;

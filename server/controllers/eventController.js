@@ -308,6 +308,95 @@ export const getEventStats = async (req, res) => {
   }
 };
 
+export const getPastEvents = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 8;
+    const category = req.query.category;
+
+    const query = {
+      status: 'published',
+      date: { $lt: new Date() }
+    };
+    if (category) query.category = category;
+
+    const events = await Event.find(query)
+      .populate('organizer', 'name avatar')
+      .sort({ date: -1 })
+      .limit(limit);
+
+    // Aggregate reviews for each event in one query
+    const Review = (await import('../models/Review.js')).default;
+    const eventIds = events.map(e => e._id);
+
+    const reviewAggregates = await Review.aggregate([
+      { $match: { event: { $in: eventIds } } },
+      {
+        $group: {
+          _id: '$event',
+          avgRating: { $avg: '$rating' },
+          totalReviews: { $sum: 1 },
+          topComment: { $first: '$comment' },
+          topRating: { $first: '$rating' }
+        }
+      }
+    ]);
+
+    // Also grab the top reviewer name for each event
+    const topReviews = await Review.aggregate([
+      { $match: { event: { $in: eventIds } } },
+      { $sort: { rating: -1, createdAt: -1 } },
+      {
+        $group: {
+          _id: '$event',
+          comment: { $first: '$comment' },
+          rating: { $first: '$rating' },
+          userId: { $first: '$user' }
+        }
+      }
+    ]);
+
+    const userIds = topReviews.map(r => r.userId);
+    const users = await User.find({ _id: { $in: userIds } }).select('name');
+    const userMap = {};
+    users.forEach(u => { userMap[u._id.toString()] = u.name; });
+
+    const reviewMap = {};
+    reviewAggregates.forEach(r => { reviewMap[r._id.toString()] = r; });
+    const topReviewMap = {};
+    topReviews.forEach(r => {
+      topReviewMap[r._id.toString()] = {
+        comment: r.comment,
+        rating: r.rating,
+        reviewerName: userMap[r.userId?.toString()] || 'Attendee'
+      };
+    });
+
+    const enriched = events.map(event => {
+      const obj = event.toObject();
+      const rid = obj._id.toString();
+      const agg = reviewMap[rid] || {};
+      const top = topReviewMap[rid] || null;
+      const soldTickets = obj.totalSeats - obj.availableSeats;
+      const minPrice = obj.ticketTypes?.length
+        ? Math.min(...obj.ticketTypes.map(t => t.price))
+        : 0;
+      return {
+        ...obj,
+        minPrice,
+        soldTickets,
+        attendeeCount: soldTickets,
+        avgRating: agg.avgRating ? Number(agg.avgRating.toFixed(1)) : 0,
+        totalReviews: agg.totalReviews || 0,
+        topReview: top
+      };
+    });
+
+    res.json(enriched);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get trending events
 export const getTrendingEvents = async (req, res) => {
   try {

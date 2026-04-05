@@ -3,6 +3,8 @@ import Event from '../models/Event.js';
 import User from '../models/User.js';
 import { createNotification } from '../utils/notificationHelper.js';
 import { instance } from '../config/razorpay.js';
+import { sendEmail } from '../utils/sendEmail.js';
+import { bookingConfirmedEmailTemplate, bookingCancelledEmailTemplate } from '../utils/emailTemplates.js';
 import crypto from 'crypto';
 
 const generateBookingReference = () => {
@@ -174,6 +176,13 @@ export const verifyPayment = async (req, res) => {
       booking._id
     );
 
+    // Send confirmation email (non-blocking)
+    sendEmail({
+      email: populatedBooking.user.email,
+      subject: `Booking Confirmed – ${event.title} | Ref: ${booking.bookingReference}`,
+      html: bookingConfirmedEmailTemplate(populatedBooking.user, event, booking)
+    }).catch(err => console.error('Booking confirmation email error:', err));
+
     res.status(201).json({
       success: true,
       booking: populatedBooking
@@ -251,6 +260,13 @@ export const createBooking = async (req, res) => {
       eventId,
       booking._id
     );
+
+    // Send confirmation email (non-blocking)
+    sendEmail({
+      email: populatedBooking.user.email,
+      subject: `Booking Confirmed – ${event.title} | Ref: ${booking.bookingReference}`,
+      html: bookingConfirmedEmailTemplate(populatedBooking.user, event, booking)
+    }).catch(err => console.error('Booking confirmation email error:', err));
 
     res.status(201).json(populatedBooking);
   } catch (error) {
@@ -337,6 +353,14 @@ export const cancelBooking = async (req, res) => {
       booking.event,
       booking._id
     );
+
+    // Send cancellation email (non-blocking)
+    const cancelUser = await User.findById(req.user._id).select('name email');
+    sendEmail({
+      email: cancelUser.email,
+      subject: `Booking Cancelled – ${event.title} | Ref: ${booking.bookingReference}`,
+      html: bookingCancelledEmailTemplate(cancelUser, event, booking)
+    }).catch(err => console.error('Cancellation email error:', err));
 
     res.json({ message: 'Booking cancelled', booking });
   } catch (error) {

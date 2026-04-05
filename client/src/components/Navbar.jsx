@@ -115,6 +115,7 @@ const Navbar = () => {
                     <NavLink to="/create-event">Create</NavLink>
                     <NavLink to="/my-events">My Events</NavLink>
                     <NavLink to="/wishlists">Wishlists</NavLink>
+                    <NavLink to="/my-bookings">Bookings</NavLink>
                   </>
                 )}
 

@@ -24,7 +24,12 @@ const AdminDashboard = () => {
   const [showSlideForm, setShowSlideForm] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [imageMode, setImageMode] = useState('upload'); // 'upload' | 'url'
-  
+
+  // confirm modal state
+  const [confirmModal, setConfirmModal] = useState(null);
+  // reject reason modal state
+  const [rejectModal, setRejectModal] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -70,18 +75,18 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteUser = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await axios.delete(`${API_URL}/admin/users/${userId}`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
-        showToast('✅ User deleted successfully', 'success');
-        fetchData();
-      } catch (error) {
-        showToast('❌ Failed to delete user', 'error');
+  const handleDeleteUser = (userId) => {
+    setConfirmModal({
+      message: 'Are you sure you want to delete this user? This cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API_URL}/admin/users/${userId}`, { headers: { Authorization: `Bearer ${user.token}` } });
+          showToast('✅ User deleted successfully', 'success');
+          fetchData();
+        } catch { showToast('❌ Failed to delete user', 'error'); }
+        setConfirmModal(null);
       }
-    }
+    });
   };
 
   const handleSuspendUser = async (userId) => {
@@ -126,49 +131,47 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRejectEvent = async (eventId) => {
-    const reason = prompt('Enter rejection reason:');
-    if (reason) {
-      try {
-        await axios.put(
-          `${API_URL}/admin/events/${eventId}/reject`,
-          { reason },
-          { headers: { Authorization: `Bearer ${user.token}` } }
-        );
-        showToast('✅ Event rejected', 'success');
-        fetchData();
-      } catch (error) {
-        showToast('❌ Failed to reject event', 'error');
-      }
-    }
+  const handleRejectEvent = (eventId) => {
+    setRejectReason('');
+    setRejectModal(eventId);
   };
 
-  const handleDeleteEvent = async (eventId) => {
-    if (window.confirm('Are you sure you want to delete this event?')) {
-      try {
-        await axios.delete(`${API_URL}/admin/events/${eventId}`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
-        showToast('✅ Event deleted successfully', 'success');
-        fetchData();
-      } catch (error) {
-        showToast('❌ Failed to delete event', 'error');
-      }
-    }
+  const submitRejectEvent = async () => {
+    if (!rejectReason.trim()) { showToast('❌ Please enter a rejection reason', 'error'); return; }
+    try {
+      await axios.put(`${API_URL}/admin/events/${rejectModal}/reject`, { reason: rejectReason }, { headers: { Authorization: `Bearer ${user.token}` } });
+      showToast('✅ Event rejected', 'success');
+      setRejectModal(null);
+      fetchData();
+    } catch { showToast('❌ Failed to reject event', 'error'); }
   };
 
-  const handleDeleteReview = async (reviewId) => {
-    if (window.confirm('Are you sure you want to delete this review?')) {
-      try {
-        await axios.delete(`${API_URL}/admin/reviews/${reviewId}`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
-        showToast('✅ Review deleted successfully', 'success');
-        fetchData();
-      } catch (error) {
-        showToast('❌ Failed to delete review', 'error');
+  const handleDeleteEvent = (eventId) => {
+    setConfirmModal({
+      message: 'Delete this event? All associated bookings will also be removed.',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API_URL}/admin/events/${eventId}`, { headers: { Authorization: `Bearer ${user.token}` } });
+          showToast('✅ Event deleted successfully', 'success');
+          fetchData();
+        } catch { showToast('❌ Failed to delete event', 'error'); }
+        setConfirmModal(null);
       }
-    }
+    });
+  };
+
+  const handleDeleteReview = (reviewId) => {
+    setConfirmModal({
+      message: 'Delete this review permanently?',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API_URL}/admin/reviews/${reviewId}`, { headers: { Authorization: `Bearer ${user.token}` } });
+          showToast('✅ Review deleted successfully', 'success');
+          fetchData();
+        } catch { showToast('❌ Failed to delete review', 'error'); }
+        setConfirmModal(null);
+      }
+    });
   };
 
   const handleUpdateContactStatus = async (contactId, status) => {
@@ -185,18 +188,18 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteContact = async (contactId) => {
-    if (window.confirm('Are you sure you want to delete this contact submission?')) {
-      try {
-        await axios.delete(`${API_URL}/contact/${contactId}`, {
-          headers: { Authorization: `Bearer ${user.token}` }
-        });
-        showToast('✅ Contact deleted successfully', 'success');
-        fetchData();
-      } catch (error) {
-        showToast('❌ Failed to delete contact', 'error');
+  const handleDeleteContact = (contactId) => {
+    setConfirmModal({
+      message: 'Delete this contact submission?',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API_URL}/contact/${contactId}`, { headers: { Authorization: `Bearer ${user.token}` } });
+          showToast('✅ Contact deleted successfully', 'success');
+          fetchData();
+        } catch { showToast('❌ Failed to delete contact', 'error'); }
+        setConfirmModal(null);
       }
-    }
+    });
   };
 
   const BLANK_SLIDE = { tag: '', heading: '', highlight: '', sub: '', image: '', order: 0, active: true };
@@ -223,15 +226,18 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteSlide = async (id) => {
-    if (!window.confirm('Delete this slide?')) return;
-    try {
-      await axios.delete(`${API_URL}/hero-slides/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
-      showToast('✅ Slide deleted', 'success');
-      fetchData();
-    } catch (err) {
-      showToast('❌ Failed to delete slide', 'error');
-    }
+  const handleDeleteSlide = (id) => {
+    setConfirmModal({
+      message: 'Delete this hero slide?',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`${API_URL}/hero-slides/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
+          showToast('✅ Slide deleted', 'success');
+          fetchData();
+        } catch { showToast('❌ Failed to delete slide', 'error'); }
+        setConfirmModal(null);
+      }
+    });
   };
 
   const handleToggleSlide = async (s) => {
@@ -329,6 +335,7 @@ const AdminDashboard = () => {
   );
 
   return (
+    <>
     <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
       <ToastContainer toasts={toasts} removeToast={removeToast} />
       <div className="container mx-auto px-4">
@@ -971,6 +978,55 @@ const AdminDashboard = () => {
       )}
       </div>
     </div>
+
+      {/* Generic Confirm Modal */}
+      {confirmModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md text-center">
+            <div className="text-4xl mb-3">⚠️</div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Are you sure?</h3>
+            <p className="text-gray-500 text-sm mb-6">{confirmModal.message}</p>
+            <div className="flex gap-3">
+              <button onClick={confirmModal.onConfirm}
+                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700">
+                Confirm
+              </button>
+              <button onClick={() => setConfirmModal(null)}
+                className="flex-1 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:border-gray-400">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reject Event Modal */}
+      {rejectModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Reject Event</h3>
+            <p className="text-gray-500 text-sm mb-3">Provide a reason so the organizer knows what to fix.</p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Enter rejection reason..."
+              rows={4}
+              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-red-400 resize-none mb-4"
+            />
+            <div className="flex gap-3">
+              <button onClick={submitRejectEvent}
+                className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700">
+                Reject Event
+              </button>
+              <button onClick={() => setRejectModal(null)}
+                className="flex-1 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:border-gray-400">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
