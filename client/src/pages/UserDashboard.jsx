@@ -117,7 +117,7 @@ const UserDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 mb-1 font-medium text-sm">Total Spent</p>
-                <p className="text-3xl md:text-4xl font-bold text-gray-900">${stats.totalSpent}</p>
+                <p className="text-3xl md:text-4xl font-bold text-gray-900">₹{stats.totalSpent}</p>
               </div>
               <div className="w-12 h-12 md:w-14 md:h-14 bg-green-100 rounded-xl flex items-center justify-center">
                 <FaStar className="text-green-600 text-xl md:text-2xl" />

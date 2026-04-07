@@ -90,6 +90,18 @@ const EventDetails = () => {
     setBookingLoading(true);
     try {
       const { data: orderData } = await api.post('/bookings/create-order', { eventId: event._id, tickets: bookingTickets });
+
+      // ── Free event: confirm directly, no payment gateway ─────────────────
+      if (orderData.isFree) {
+        const { data } = await api.post('/bookings', { eventId: event._id, tickets: bookingTickets });
+        setBookingLoading(false);
+        success('🎉 You\'re registered! Check your email for confirmation.');
+        window.dispatchEvent(new Event('notificationsUpdated'));
+        setTimeout(() => navigate('/my-bookings'), 2000);
+        return;
+      }
+
+      // ── Paid event: open Razorpay ─────────────────────────────────────────
       setBookingLoading(false);
 
       const razorpay = new window.Razorpay({
@@ -337,7 +349,7 @@ const EventDetails = () => {
                           <h3 className="font-bold text-gray-900 text-sm mb-2 line-clamp-1 group-hover:text-purple-600">{rel.title}</h3>
                           <div className="flex items-center justify-between text-xs text-gray-500">
                             <span className="flex items-center gap-1"><FaCalendar /> {new Date(rel.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                            <span className="font-bold text-purple-600">From ${Math.min(...rel.ticketTypes.map(t => t.price))}</span>
+                            <span className="font-bold text-purple-600">From ₹{Math.min(...rel.ticketTypes.map(t => t.price))}</span>
                           </div>
                         </div>
                       </Link>
@@ -481,6 +493,7 @@ const EventDetails = () => {
                         const available = ticket.quantity - ticket.sold;
                         const isAvailable = available > 0;
                         const qty = tickets[ticket.name] || 0;
+                        const isFreeTicket = ticket.price === 0;
                         return (
                           <div key={ticket.name} className={`border rounded-xl p-4 ${isAvailable ? 'border-gray-200' : 'border-gray-100 bg-gray-50 opacity-60'}`}>
                             <div className="flex items-center justify-between mb-3">
@@ -490,7 +503,11 @@ const EventDetails = () => {
                                   {isAvailable ? `${available} available` : 'Sold Out'}
                                 </p>
                               </div>
-                              <span className="text-xl font-bold text-purple-600">${ticket.price}</span>
+                              {isFreeTicket ? (
+                                <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-bold rounded-full border border-green-200">FREE</span>
+                              ) : (
+                                <span className="text-xl font-bold text-purple-600">₹{ticket.price}</span>
+                              )}
                             </div>
                             {isAvailable && (
                               <div className="flex items-center gap-2">
@@ -509,15 +526,13 @@ const EventDetails = () => {
                       <div className="border-t border-gray-100 pt-4 mb-5 space-y-2">
                         <div className="flex justify-between text-sm text-gray-600">
                           <span>{totalTickets} ticket{totalTickets > 1 ? 's' : ''}</span>
-                          <span>${totalAmount.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-gray-600">
-                          <span>Service fee</span>
-                          <span>$0.00</span>
+                          <span>{totalAmount === 0 ? 'Free' : `₹${totalAmount.toFixed(2)}`}</span>
                         </div>
                         <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-100">
                           <span>Total</span>
-                          <span className="text-purple-600 text-lg">${totalAmount.toFixed(2)}</span>
+                          <span className={totalAmount === 0 ? 'text-green-600 text-lg' : 'text-purple-600 text-lg'}>
+                            {totalAmount === 0 ? 'FREE' : `₹${totalAmount.toFixed(2)}`}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -533,11 +548,18 @@ const EventDetails = () => {
                       </div>
                     )}
 
-                    {/* Payment note */}
-                    {!user?.suspended && totalTickets > 0 && (
+                    {/* Payment note — only for paid events */}
+                    {!user?.suspended && totalTickets > 0 && totalAmount > 0 && (
                       <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-xl mb-4 text-xs">
                         <p className="font-semibold mb-1">💳 Accepted: UPI · Net Banking · Indian Cards</p>
                         <p className="text-blue-600">⚠️ International cards not supported</p>
+                      </div>
+                    )}
+
+                    {/* Free event note */}
+                    {!user?.suspended && totalTickets > 0 && totalAmount === 0 && (
+                      <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-4 text-xs font-semibold flex items-center gap-2">
+                        🎟️ This is a free event — no payment required!
                       </div>
                     )}
 
@@ -545,13 +567,19 @@ const EventDetails = () => {
                     <button
                       onClick={handleBooking}
                       disabled={totalTickets === 0 || bookingLoading || user?.suspended}
-                      className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className={`w-full py-3.5 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                        totalAmount === 0
+                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'
+                          : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700'
+                      }`}
                     >
                       {bookingLoading ? (
                         <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Processing...</>
                       ) : user?.suspended ? '🚫 Account Suspended'
                         : totalTickets === 0 ? 'Select Tickets'
-                        : <><FaTicketAlt /> Book {totalTickets} Ticket{totalTickets > 1 ? 's' : ''}</>
+                        : totalAmount === 0
+                          ? <><FaTicketAlt /> Register Free — {totalTickets} Ticket{totalTickets > 1 ? 's' : ''}</>
+                          : <><FaTicketAlt /> Book {totalTickets} Ticket{totalTickets > 1 ? 's' : ''}</>
                       }
                     </button>
 

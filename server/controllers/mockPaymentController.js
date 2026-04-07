@@ -2,6 +2,9 @@ import Booking from '../models/Booking.js';
 import Event from '../models/Event.js';
 import User from '../models/User.js';
 import { createNotification } from '../utils/notificationHelper.js';
+import { sendEmail } from '../utils/sendEmail.js';
+import { bookingConfirmedEmailTemplate } from '../utils/emailTemplates.js';
+import { generateReceiptPdf } from '../utils/generateReceiptPdf.js';
 
 const generateBookingReference = () => {
   return 'BK' + Date.now() + Math.random().toString(36).substr(2, 9).toUpperCase();
@@ -78,6 +81,20 @@ export const createMockBooking = async (req, res) => {
       eventId,
       booking._id
     );
+
+    // Send confirmation email with PDF receipt (non-blocking)
+    generateReceiptPdf(booking, event, populatedBooking.user, 'confirmed')
+      .then(pdfBuffer => sendEmail({
+        email: populatedBooking.user.email,
+        subject: `Booking Confirmed – ${event.title} | Ref: ${booking.bookingReference}`,
+        html: bookingConfirmedEmailTemplate(populatedBooking.user, event, booking),
+        attachments: [{
+          filename: `receipt-${booking.bookingReference}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }]
+      }))
+      .catch(err => console.error('Mock booking email error:', err));
 
     res.status(201).json({
       success: true,

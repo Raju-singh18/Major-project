@@ -153,7 +153,7 @@ export default function Suggestions() {
           <div className="flex items-center justify-between pt-3 border-t border-white/30">
             <div>
               <span className="text-white/80 text-xs">From</span>
-              <div className="text-white font-bold text-xl">${event.minPrice}</div>
+              <div className="text-white font-bold text-xl">&#8377;{event.minPrice}</div>
             </div>
             <span className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold text-sm">
               Book <FaArrowRight className="text-xs" />

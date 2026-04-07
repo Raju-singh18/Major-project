@@ -302,7 +302,7 @@ export const bookingConfirmationEmailTemplate = (name, event, booking) => {
             </div>
             <div class="detail-row">
               <strong>Total Amount:</strong>
-              <span style="color: #5A43FF; font-weight: bold;">$${booking.totalAmount}</span>
+              <span style="color: #5A43FF; font-weight: bold;">&#8377;${booking.totalAmount}</span>
             </div>
           </div>
           

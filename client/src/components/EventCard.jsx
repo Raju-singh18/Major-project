@@ -179,7 +179,7 @@ const EventCard = ({ event, onWishlistChange, showToast }) => {
             <div className="text-right">
               <div className="text-xs text-dark-500 mb-0.5">From</div>
               <div className="text-primary-500 font-bold text-xl">
-                {event.isFree ? 'Free' : `$${minPrice}`}
+                {event.isFree ? 'Free' : `₹${minPrice}`}
               </div>
             </div>
           </div>

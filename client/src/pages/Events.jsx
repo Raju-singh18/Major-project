@@ -387,7 +387,7 @@ export default function Events() {
             <div className="flex items-center justify-between pt-3 border-t border-white/30">
               <div>
                 <span className="text-white/80 text-xs">From</span>
-                <div className="text-white font-bold text-xl">${event.minPrice}</div>
+                <div className="text-white font-bold text-xl">₹{event.minPrice}</div>
               </div>
               <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors text-sm">
                 Book <FaArrowRight className="text-xs" />
@@ -487,7 +487,7 @@ export default function Events() {
           <div className="flex items-center justify-between pt-4 border-t border-gray-200">
             <div>
               <span className="text-gray-600 text-sm">Starting from</span>
-              <div className="text-3xl font-bold text-purple-600">${event.minPrice}</div>
+              <div className="text-3xl font-bold text-purple-600">₹{event.minPrice}</div>
             </div>
             <button className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors">
               Book Now <FaArrowRight />
@@ -562,7 +562,7 @@ export default function Events() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Price</div>
-                  <div className="font-semibold text-2xl text-green-600">${quickViewEvent.minPrice}</div>
+                  <div className="font-semibold text-2xl text-green-600">₹{quickViewEvent.minPrice}</div>
                 </div>
               </div>
               

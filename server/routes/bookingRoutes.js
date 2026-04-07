@@ -6,7 +6,8 @@ import {
   cancelBooking,
   getAllBookings,
   createOrder,
-  verifyPayment
+  verifyPayment,
+  downloadReceipt
 } from '../controllers/bookingController.js';
 import { createMockBooking } from '../controllers/mockPaymentController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
@@ -19,11 +20,9 @@ router.route('/')
 
 router.post('/create-order', protect, createOrder);
 router.post('/verify-payment', protect, verifyPayment);
-
-// Mock payment for development (when Razorpay is not configured)
 router.post('/mock-payment', protect, createMockBooking);
-
 router.get('/my-bookings', protect, getMyBookings);
+router.get('/:id/receipt', protect, downloadReceipt);
 
 router.route('/:id')
   .get(protect, getBookingById)

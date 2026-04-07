@@ -5,39 +5,32 @@ import { createNotification } from '../utils/notificationHelper.js';
 import { instance } from '../config/razorpay.js';
 import { sendEmail } from '../utils/sendEmail.js';
 import { bookingConfirmedEmailTemplate, bookingCancelledEmailTemplate } from '../utils/emailTemplates.js';
+import { generateReceiptPdf } from '../utils/generateReceiptPdf.js';
 import crypto from 'crypto';
 
 const generateBookingReference = () => {
   return 'BK' + Date.now() + Math.random().toString(36).substr(2, 9).toUpperCase();
 };
 
-// Create Razorpay order
+// Create Razorpay order — or signal free booking if totalAmount is 0
 export const createOrder = async (req, res) => {
   try {
-    // Check if user is suspended
     const user = await User.findById(req.user._id);
     if (user.suspended) {
-      return res.status(403).json({ 
-        message: 'Your account has been suspended. You cannot book events.' 
-      });
+      return res.status(403).json({ message: 'Your account has been suspended. You cannot book events.' });
     }
 
     const { eventId, tickets } = req.body;
 
     const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
+    if (!event) return res.status(404).json({ message: 'Event not found' });
 
     let totalAmount = 0;
     let totalTickets = 0;
 
-    // Validate tickets and calculate total
     for (const ticket of tickets) {
       const ticketType = event.ticketTypes.find(t => t.name === ticket.ticketType);
-      if (!ticketType) {
-        return res.status(400).json({ message: `Ticket type ${ticket.ticketType} not found` });
-      }
+      if (!ticketType) return res.status(400).json({ message: `Ticket type ${ticket.ticketType} not found` });
       if (ticketType.quantity - ticketType.sold < ticket.quantity) {
         return res.status(400).json({ message: `Not enough ${ticket.ticketType} tickets available` });
       }
@@ -49,34 +42,28 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ message: 'Not enough seats available' });
     }
 
-    // Create Razorpay order
+    // ── Free event: skip Razorpay entirely ───────────────────────────────────
+    if (totalAmount === 0) {
+      return res.json({ isFree: true });
+    }
+
+    // ── Paid event: create Razorpay order ────────────────────────────────────
+    if (!process.env.RAZORPAY_KEY || !process.env.RAZORPAY_SECRET) {
+      throw new Error('Razorpay credentials are not configured properly');
+    }
+
     const options = {
-      amount: totalAmount * 100, // amount in paise
-      currency: "INR",
+      amount: totalAmount * 100, // paise
+      currency: 'INR',
       receipt: generateBookingReference(),
       notes: {
-        eventId: eventId,
+        eventId,
         userId: req.user._id.toString(),
         tickets: JSON.stringify(tickets)
       }
     };
 
-    console.log('Creating Razorpay order with options:', {
-      ...options,
-      amount: options.amount,
-      currency: options.currency
-    });
-    console.log('Razorpay Key ID:', process.env.RAZORPAY_KEY ? 'Present' : 'Missing');
-    console.log('Razorpay Secret:', process.env.RAZORPAY_SECRET ? 'Present' : 'Missing');
-
-    // Validate Razorpay credentials
-    if (!process.env.RAZORPAY_KEY || !process.env.RAZORPAY_SECRET) {
-      throw new Error('Razorpay credentials are not configured properly');
-    }
-
     const order = await instance.orders.create(options);
-    
-    console.log('Razorpay order created successfully:', order.id);
 
     res.json({
       orderId: order.id,
@@ -86,15 +73,7 @@ export const createOrder = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating order:', error);
-    console.error('Error details:', {
-      message: error.message,
-      description: error.error?.description,
-      code: error.error?.code,
-      source: error.error?.source,
-      step: error.error?.step,
-      reason: error.error?.reason
-    });
-    res.status(500).json({ 
+    res.status(500).json({
       message: error.message || 'Failed to create payment order',
       error: error.error || error
     });
@@ -176,12 +155,19 @@ export const verifyPayment = async (req, res) => {
       booking._id
     );
 
-    // Send confirmation email (non-blocking)
-    sendEmail({
-      email: populatedBooking.user.email,
-      subject: `Booking Confirmed – ${event.title} | Ref: ${booking.bookingReference}`,
-      html: bookingConfirmedEmailTemplate(populatedBooking.user, event, booking)
-    }).catch(err => console.error('Booking confirmation email error:', err));
+    // Send confirmation email with PDF receipt (non-blocking)
+    generateReceiptPdf(booking, event, populatedBooking.user, 'confirmed')
+      .then(pdfBuffer => sendEmail({
+        email: populatedBooking.user.email,
+        subject: `Booking Confirmed – ${event.title} | Ref: ${booking.bookingReference}`,
+        html: bookingConfirmedEmailTemplate(populatedBooking.user, event, booking),
+        attachments: [{
+          filename: `receipt-${booking.bookingReference}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }]
+      }))
+      .catch(err => console.error('Booking confirmation email error:', err));
 
     res.status(201).json({
       success: true,
@@ -261,12 +247,19 @@ export const createBooking = async (req, res) => {
       booking._id
     );
 
-    // Send confirmation email (non-blocking)
-    sendEmail({
-      email: populatedBooking.user.email,
-      subject: `Booking Confirmed – ${event.title} | Ref: ${booking.bookingReference}`,
-      html: bookingConfirmedEmailTemplate(populatedBooking.user, event, booking)
-    }).catch(err => console.error('Booking confirmation email error:', err));
+    // Send confirmation email with PDF receipt (non-blocking)
+    generateReceiptPdf(booking, event, populatedBooking.user, 'confirmed')
+      .then(pdfBuffer => sendEmail({
+        email: populatedBooking.user.email,
+        subject: `Booking Confirmed – ${event.title} | Ref: ${booking.bookingReference}`,
+        html: bookingConfirmedEmailTemplate(populatedBooking.user, event, booking),
+        attachments: [{
+          filename: `receipt-${booking.bookingReference}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }]
+      }))
+      .catch(err => console.error('Booking confirmation email error:', err));
 
     res.status(201).json(populatedBooking);
   } catch (error) {
@@ -354,13 +347,20 @@ export const cancelBooking = async (req, res) => {
       booking._id
     );
 
-    // Send cancellation email (non-blocking)
+    // Send cancellation email with PDF receipt (non-blocking)
     const cancelUser = await User.findById(req.user._id).select('name email');
-    sendEmail({
-      email: cancelUser.email,
-      subject: `Booking Cancelled – ${event.title} | Ref: ${booking.bookingReference}`,
-      html: bookingCancelledEmailTemplate(cancelUser, event, booking)
-    }).catch(err => console.error('Cancellation email error:', err));
+    generateReceiptPdf(booking, event, cancelUser, 'cancelled')
+      .then(pdfBuffer => sendEmail({
+        email: cancelUser.email,
+        subject: `Booking Cancelled – ${event.title} | Ref: ${booking.bookingReference}`,
+        html: bookingCancelledEmailTemplate(cancelUser, event, booking),
+        attachments: [{
+          filename: `cancellation-${booking.bookingReference}.pdf`,
+          content: pdfBuffer,
+          contentType: 'application/pdf'
+        }]
+      }))
+      .catch(err => console.error('Cancellation email error:', err));
 
     res.json({ message: 'Booking cancelled', booking });
   } catch (error) {
@@ -376,6 +376,36 @@ export const getAllBookings = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Download receipt PDF for a booking
+export const downloadReceipt = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate('event')
+      .populate('user', 'name email');
+
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+    if (booking.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    const type = booking.status === 'cancelled' ? 'cancelled' : 'confirmed';
+    const pdfBuffer = await generateReceiptPdf(booking, booking.event, booking.user, type);
+
+    const filename = `${type === 'cancelled' ? 'cancellation' : 'receipt'}-${booking.bookingReference}.pdf`;
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': pdfBuffer.length
+    });
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Receipt download error:', error);
     res.status(500).json({ message: error.message });
   }
 };

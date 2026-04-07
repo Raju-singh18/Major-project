@@ -415,7 +415,7 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1 font-semibold">Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">${stats?.totalRevenue || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">₹{stats?.totalRevenue || 0}</p>
             </div>
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
               <FaDollarSign className="text-white text-xl" />
@@ -457,7 +457,7 @@ const AdminDashboard = () => {
                     <div className="font-semibold text-gray-900">{event._id?.title || 'Untitled Event'}</div>
                     <div className="flex justify-between text-sm text-gray-600 mt-1">
                       <span>{event.bookings} bookings</span>
-                      <span className="text-green-600 font-semibold">${event.revenue}</span>
+                      <span className="text-green-600 font-semibold">₹{event.revenue}</span>
                     </div>
                   </div>
                 ))

@@ -6,7 +6,8 @@ export const sendEmail = async (options) => {
       from: `"EventMe" <${process.env.EMAIL_USER}>`,
       to: options.email,
       subject: options.subject,
-      html: options.html
+      html: options.html,
+      ...(options.attachments && { attachments: options.attachments })
     };
 
     const info = await transporter.sendMail(mailOptions);
