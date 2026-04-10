@@ -16,7 +16,7 @@ const Profile = () => {
   const { toasts, success, error: toastError, removeToast } = useToast();
 
   const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', bio: '', avatar: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', bio: '', address: '', avatar: '', password: '' });
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState('');
@@ -31,7 +31,7 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       const { data } = await api.get('/auth/profile');
-      setFormData({ name: data.name, email: data.email, phone: data.phone || '', bio: data.bio || '', avatar: data.avatar || '', password: '' });
+      setFormData({ name: data.name, email: data.email, phone: data.phone || '', bio: data.bio || '', address: data.address || '', avatar: data.avatar || '', password: '' });
       setAvatarPreview(data.avatar || '');
     } catch (err) {
       console.error(err);
@@ -105,12 +105,12 @@ const Profile = () => {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Page Title */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>My Profile</h1>
+            <h1 className="text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>My Profile</h1>
             <p className="text-gray-600 mt-1">Manage your personal information and account settings</p>
           </div>
 
@@ -127,7 +127,7 @@ const Profile = () => {
                     {avatarPreview ? (
                       <img src={avatarPreview} alt={formData.name} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white text-4xl font-bold">
+                      <div className="w-full h-full bg-purple-600 flex items-center justify-center text-white text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold">
                         {initials}
                       </div>
                     )}
@@ -154,9 +154,9 @@ const Profile = () => {
                 <p className="text-gray-500 text-sm mb-4">{formData.email}</p>
 
                 <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold text-white ${
-                  user?.role === 'admin' ? 'bg-gradient-to-r from-purple-600 to-pink-600'
-                  : user?.role === 'organizer' ? 'bg-gradient-to-r from-orange-500 to-red-500'
-                  : 'bg-gradient-to-r from-purple-600 to-indigo-600'
+                  user?.role === 'admin' ? 'bg-purple-700'
+                  : user?.role === 'organizer' ? 'bg-orange-500'
+                  : 'bg-purple-600'
                 }`}>
                   {user?.role === 'admin' ? '👑 Admin' : user?.role === 'organizer' ? '✨ Organizer' : '👤 User'}
                 </span>
@@ -168,7 +168,7 @@ const Profile = () => {
 
                 {!editing && (
                   <button onClick={() => setEditing(true)}
-                    className="mt-6 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700">
+                    className="mt-6 w-full flex items-center justify-center gap-2 bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700">
                     <FaEdit /> Edit Profile
                   </button>
                 )}
@@ -240,7 +240,7 @@ const Profile = () => {
                   {editing && (
                     <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
                       <button type="submit" disabled={saving || avatarUploading}
-                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="flex-1 flex items-center justify-center gap-2 bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed">
                         {saving ? (
                           <><svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg> Saving...</>
                         ) : <><FaSave /> Save Changes</>}
@@ -288,7 +288,7 @@ const Profile = () => {
         {/* Delete Account Modal */}
         {showDeleteModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl p-8 w-full max-w-md">
+            <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <FaTrash className="text-red-600 text-lg" />
@@ -346,3 +346,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

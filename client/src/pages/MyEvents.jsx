@@ -48,9 +48,9 @@ const MyEvents = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center pt-28 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen flex items-center justify-center pt-20 sm:pt-28 bg-gray-50">
       <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -66,12 +66,12 @@ const MyEvents = () => {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
         <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900">My Events</h1>
+            <h1 className="text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">My Events</h1>
             <Link to="/create-event"
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-indigo-700 hover:scale-105 transition-all font-bold">
+              className="bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition-colors font-bold">
               ✨ Create New Event
             </Link>
           </div>
@@ -81,14 +81,14 @@ const MyEvents = () => {
               <div className="text-6xl mb-4">📅</div>
               <p className="mb-4 text-gray-700 text-xl">You haven't created any events yet</p>
               <Link to="/create-event"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 hover:scale-105 transition-all">
+                className="inline-block px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors">
                 Create your first event
               </Link>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {events.map((event) => (
-                <div key={event._id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 hover:scale-105 transition-all">
+                <div key={event._id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 transition-colors">
                   <img src={event.image} alt={event.title} className="w-full h-48 object-cover" />
                   <div className="p-6">
                     <span className={`text-xs px-3 py-1 rounded-full font-bold ${
@@ -106,15 +106,15 @@ const MyEvents = () => {
                     </div>
                     <div className="flex gap-2">
                       <Link to={`/event-dashboard/${event._id}`}
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2 rounded-xl text-center hover:from-purple-700 hover:to-indigo-700 transition-all font-bold text-sm">
+                        className="flex-1 bg-purple-600 text-white py-2 rounded-xl text-center hover:bg-purple-700 transition-colors font-bold text-sm">
                         Dashboard
                       </Link>
                       <Link to={`/edit-event/${event._id}`}
-                        className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-all">
+                        className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-colors">
                         <FaEdit />
                       </Link>
                       <button onClick={() => setConfirmDeleteId(event._id)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition-all">
+                        className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition-colors">
                         <FaTrash />
                       </button>
                     </div>
@@ -129,7 +129,7 @@ const MyEvents = () => {
       {/* Delete Confirm Modal */}
       {confirmDeleteId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md">
+          <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md">
             <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FaTrash className="text-red-600 text-xl" />
             </div>
@@ -159,3 +159,4 @@ const MyEvents = () => {
 };
 
 export default MyEvents;
+

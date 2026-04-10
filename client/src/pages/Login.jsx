@@ -61,17 +61,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 pt-32 pb-12">
-      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 pt-32 pb-12">
+      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-6 sm:gap-8 items-center">
         {/* LEFT SIDE - BRANDING */}
         <div className="hidden lg:block">
-          <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-6">
+          <div className="w-20 h-20 bg-purple-600 rounded-2xl flex items-center justify-center mb-6">
             <FaCalendarAlt className="text-white text-4xl" />
           </div>
 
-          <h1 className="text-5xl font-bold mb-4 text-gray-900" style={{ fontFamily: "Poppins, sans-serif" }}>
+          <h1 className="text-3xl sm:text-2xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900" style={{ fontFamily: "Poppins, sans-serif" }}>
             Welcome Back to
-            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent block mt-2">
+            <span className="bg-purple-600 bg-clip-text text-transparent block mt-2">
               EventMe
             </span>
           </h1>
@@ -82,19 +82,19 @@ const Login = () => {
 
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaCheckCircle className="text-white" />
               </div>
               <span className="text-gray-700 font-medium">Access thousands of events</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaCheckCircle className="text-white" />
               </div>
               <span className="text-gray-700 font-medium">Manage your bookings easily</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaCheckCircle className="text-white" />
               </div>
               <span className="text-gray-700 font-medium">Create and organize events</span>
@@ -104,9 +104,9 @@ const Login = () => {
 
         {/* RIGHT SIDE - LOGIN FORM */}
         <div className="w-full">
-          <div className="bg-white border border-gray-200 rounded-3xl p-8 md:p-10">
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-5 sm:p-8 md:p-10">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Poppins, sans-serif" }}>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Poppins, sans-serif" }}>
                 Login to Your Account
               </h2>
               <p className="text-gray-600">Enter your credentials to continue</p>
@@ -133,7 +133,7 @@ const Login = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-400"
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-gray-400"
                     placeholder="your@email.com"
                     required
                   />
@@ -148,7 +148,7 @@ const Login = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-400"
+                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors placeholder-gray-400"
                     placeholder="••••••••"
                     required
                   />
@@ -167,7 +167,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading || success}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -225,3 +225,4 @@ const Login = () => {
 };
 
 export default Login;
+

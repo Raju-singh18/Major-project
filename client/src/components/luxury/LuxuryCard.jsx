@@ -6,7 +6,7 @@ const LuxuryCard = ({
   className = '',
   ...props 
 }) => {
-  const baseClasses = 'rounded-3xl overflow-hidden transition-all duration-500';
+  const baseClasses = 'rounded-3xl overflow-hidden transition-colors duration-500';
   
   const variants = {
     default: 'bg-white shadow-luxury border border-royal-border',
@@ -44,3 +44,4 @@ const LuxuryCard = ({
 };
 
 export default LuxuryCard;
+

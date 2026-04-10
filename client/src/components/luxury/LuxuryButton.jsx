@@ -12,7 +12,7 @@ const LuxuryButton = ({
   className = '',
   ...props 
 }) => {
-  const baseClasses = 'font-semibold rounded-2xl transition-all duration-400 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden';
+  const baseClasses = 'font-semibold rounded-2xl transition-colors duration-400 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden';
   
   const variants = {
     primary: `
@@ -20,7 +20,7 @@ const LuxuryButton = ({
       text-white
       shadow-luxury
       hover:shadow-luxury-lg
-      hover:-translate-y-1
+     
       active:translate-y-0
     `,
     secondary: `
@@ -36,7 +36,7 @@ const LuxuryButton = ({
       text-white
       shadow-luxury
       hover:shadow-luxury-lg
-      hover:-translate-y-1
+     
     `,
     outline: `
       bg-transparent
@@ -55,18 +55,16 @@ const LuxuryButton = ({
       hover:bg-white/90
     `,
     danger: `
-      bg-gradient-to-r from-red-500 to-red-600
+      bg-red-600
       text-white
       shadow-lg shadow-red-500/25
-      hover:shadow-xl hover:shadow-red-500/40
-      hover:-translate-y-1
+      hover:bg-red-700
     `,
     success: `
-      bg-gradient-to-r from-green-500 to-green-600
+      bg-green-600
       text-white
       shadow-lg shadow-green-500/25
-      hover:shadow-xl hover:shadow-green-500/40
-      hover:-translate-y-1
+      hover:bg-green-700
     `,
   };
 
@@ -110,3 +108,4 @@ const LuxuryButton = ({
 };
 
 export default LuxuryButton;
+

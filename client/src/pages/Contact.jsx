@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   FaEnvelope, FaPhone, FaMapMarkerAlt, FaPaperPlane,
   FaComments, FaQuestionCircle, FaCheckCircle,
@@ -182,7 +183,7 @@ const ChatWidget = ({ onClose }) => {
   return (
     <div className="fixed bottom-6 right-6 z-[200] w-80 sm:w-96 bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden" style={{ maxHeight: '560px' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
+      <div className="bg-purple-600 px-4 py-3 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
             <FaRobot className="text-white text-lg" />
@@ -204,11 +205,11 @@ const ChatWidget = ({ onClose }) => {
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50" style={{ minHeight: 0 }}>
         {messages.map((msg, i) => (
           <div key={i} className={`flex items-end gap-2 ${msg.from === 'user' ? 'flex-row-reverse' : ''}`}>
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${msg.from === 'bot' ? 'bg-gradient-to-br from-purple-600 to-indigo-600' : 'bg-gradient-to-br from-orange-500 to-red-500'}`}>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${msg.from === 'bot' ? 'bg-purple-600' : 'bg-orange-500'}`}>
               {msg.from === 'bot' ? <FaRobot className="text-white text-xs" /> : <FaUser className="text-white text-xs" />}
             </div>
             <div className={`max-w-[78%] flex flex-col gap-1 ${msg.from === 'user' ? 'items-end' : 'items-start'}`}>
-              <div className={`px-3 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${msg.from === 'bot' ? 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm' : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-tr-sm'}`}>
+              <div className={`px-3 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${msg.from === 'bot' ? 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm' : 'bg-purple-600 text-white rounded-tr-sm'}`}>
                 {msg.text}
               </div>
               <span className="text-[10px] text-gray-400">{fmt(msg.time)}</span>
@@ -218,7 +219,7 @@ const ChatWidget = ({ onClose }) => {
 
         {typing && (
           <div className="flex items-end gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+            <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
               <FaRobot className="text-white text-xs" />
             </div>
             <div className="bg-white border border-gray-200 px-4 py-3 rounded-2xl rounded-tl-sm">
@@ -254,7 +255,7 @@ const ChatWidget = ({ onClose }) => {
           className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-purple-400 disabled:opacity-60"
         />
         <button onClick={() => sendMessage()} disabled={!input.trim() || typing}
-          className="w-9 h-9 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl flex items-center justify-center disabled:opacity-40 flex-shrink-0">
+          className="w-9 h-9 bg-purple-600 text-white rounded-xl flex items-center justify-center disabled:opacity-40 flex-shrink-0">
           <FaPaperPlane className="text-xs" />
         </button>
       </div>
@@ -268,7 +269,7 @@ const FAQAccordion = () => {
   return (
     <div className="space-y-2">
       {FAQ_ITEMS.map((item, i) => (
-        <div key={i} className={`border rounded-xl overflow-hidden transition-all ${open === i ? 'border-purple-300' : 'border-gray-200'}`}>
+        <div key={i} className={`border rounded-xl overflow-hidden transition-colors ${open === i ? 'border-purple-300' : 'border-gray-200'}`}>
           <button
             onClick={() => setOpen(open === i ? null : i)}
             className="w-full flex items-center justify-between px-4 py-3.5 text-left bg-white hover:bg-gray-50"
@@ -293,11 +294,35 @@ const FAQAccordion = () => {
 // ── Main Contact Page ─────────────────────────────────────────────────────────
 const Contact = () => {
   const formRef = useRef(null);
+  const location = useLocation();
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [contactInfo, setContactInfo] = useState(null);
   const { showToast, toasts, removeToast } = useToast();
+
+  // Auto-open chat if navigated here with state.openChat
+  useEffect(() => {
+    if (location.state?.openChat) {
+      setChatOpen(true);
+      window.history.replaceState({}, document.title);
+    }
+    if (location.hash === '#faq') {
+      setTimeout(() => document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' }), 200);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    api.get('/admin/contact-info')
+      .then(({ data }) => setContactInfo(data))
+      .catch(() => setContactInfo({
+        email: 'support@eventme.com',
+        phone: '+91 0000000000',
+        address: 'EventMe HQ',
+        name: 'EventMe Support'
+      }));
+  }, []);
 
   const scrollToForm = (preSubject = '') => {
     if (preSubject) setFormData(prev => ({ ...prev, subject: preSubject }));
@@ -323,7 +348,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <ToastContainer toasts={toasts} removeToast={removeToast} />
 
       {/* Chat Widget */}
@@ -333,7 +358,7 @@ const Contact = () => {
       {!chatOpen && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-6 right-6 z-[200] w-14 h-14 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full shadow-lg flex items-center justify-center hover:from-purple-700 hover:to-indigo-700"
+          className="fixed bottom-6 right-6 z-[200] w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-purple-700"
           title="Start Chat"
         >
           <FaComments className="text-xl" />
@@ -341,13 +366,13 @@ const Contact = () => {
       )}
 
       {/* Hero */}
-      <div className="pt-28 pb-12">
+      <div className="pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12">
         <div className="container mx-auto px-4 sm:px-6 text-center max-w-4xl">
           <div className="inline-flex items-center gap-2 bg-green-100 border border-green-200 px-4 py-2 rounded-full mb-5">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="font-semibold text-sm text-green-700">We're Online — Ready to Help</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-3xl sm:text-4xl md:text-3xl sm:text-2xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Get in Touch
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -357,41 +382,41 @@ const Contact = () => {
       </div>
 
       {/* Contact Method Cards */}
-      <div className="container mx-auto px-4 sm:px-6 mb-12 max-w-6xl">
+      <div className="container mx-auto px-4 sm:px-6 mb-6 sm:mb-12 max-w-6xl">
         <div className="grid sm:grid-cols-3 gap-6">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center">
-            <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <FaEnvelope className="text-white text-xl" />
             </div>
             <h3 className="font-bold text-gray-900 mb-1">Email Support</h3>
             <p className="text-gray-500 text-sm mb-3">Response within 24 hours</p>
-            <a href="mailto:support@eventme.com" className="text-purple-600 font-semibold text-sm hover:text-purple-700">
-              support@eventme.com
+            <a href={`mailto:${contactInfo?.email || 'support@eventme.com'}`} className="text-purple-600 font-semibold text-sm hover:text-purple-700">
+              {contactInfo?.email || 'support@eventme.com'}
             </a>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center">
-            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
               <FaComments className="text-white text-xl" />
             </div>
             <h3 className="font-bold text-gray-900 mb-1">Live Chat</h3>
             <p className="text-gray-500 text-sm mb-3">Instant help, available now</p>
             <button
               onClick={() => setChatOpen(true)}
-              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold text-sm hover:from-orange-600 hover:to-red-600"
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold text-sm hover:bg-orange-600"
             >
               Start Chat
             </button>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
               <FaPhone className="text-white text-xl" />
             </div>
             <h3 className="font-bold text-gray-900 mb-1">Call Us</h3>
             <p className="text-gray-500 text-sm mb-3">Mon–Fri, 9 AM – 6 PM</p>
-            <a href="tel:+12345678900" className="text-purple-600 font-semibold text-sm hover:text-purple-700">
-              +1 (234) 567-8900
+            <a href={`tel:${contactInfo?.phone || ''}`} className="text-purple-600 font-semibold text-sm hover:text-purple-700">
+              {contactInfo?.phone || '+91 0000000000'}
             </a>
           </div>
         </div>
@@ -455,7 +480,7 @@ const Contact = () => {
                 </div>
 
                 <button type="submit" disabled={loading}
-                  className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  className="w-full py-3.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                   {loading
                     ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Sending...</>
                     : <><FaPaperPlane /> Send Message</>
@@ -476,17 +501,21 @@ const Contact = () => {
               </h3>
               <div className="space-y-3">
                 {[
-                  { icon: FaEnvelope, label: 'Email', value: 'support@eventme.com', color: 'from-purple-600 to-indigo-600' },
-                  { icon: FaPhone, label: 'Phone', value: '+1 (234) 567-8900', color: 'from-orange-500 to-red-500' },
-                  { icon: FaMapMarkerAlt, label: 'Office', value: 'MMMUT, GORAKHPUR 273010', color: 'from-blue-500 to-cyan-600' },
-                ].map(({ icon: Icon, label, value, color }) => (
+                  { icon: FaEnvelope, label: 'Email', value: contactInfo?.email || '—', color: 'bg-purple-600', href: `mailto:${contactInfo?.email}` },
+                  { icon: FaPhone, label: 'Phone', value: contactInfo?.phone || '—', color: 'bg-orange-500', href: `tel:${contactInfo?.phone}` },
+                  { icon: FaMapMarkerAlt, label: 'Office', value: contactInfo?.address || '—', color: 'bg-blue-600', href: null },
+                ].map(({ icon: Icon, label, value, color, href }) => (
                   <div key={label} className="flex items-center gap-3">
-                    <div className={`w-9 h-9 bg-gradient-to-br ${color} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-9 h-9 ${color} rounded-lg flex items-center justify-center flex-shrink-0`}>
                       <Icon className="text-white text-xs" />
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">{label}</p>
-                      <p className="text-sm font-semibold text-gray-900">{value}</p>
+                      {href ? (
+                        <a href={href} className="text-sm font-semibold text-gray-900 hover:text-purple-600 transition-colors">{value}</a>
+                      ) : (
+                        <p className="text-sm font-semibold text-gray-900">{value}</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -516,9 +545,9 @@ const Contact = () => {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-12">
+        <div id="faq-section" className="mt-12">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Frequently Asked Questions
             </h2>
             <p className="text-gray-500">Click any question to see the answer</p>
@@ -529,7 +558,7 @@ const Contact = () => {
               <p className="text-gray-500 text-sm mb-3">Still have questions?</p>
               <button
                 onClick={() => setChatOpen(true)}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 text-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 text-sm"
               >
                 <FaComments /> Chat with Support
               </button>
@@ -539,9 +568,9 @@ const Contact = () => {
       </div>
 
       {/* Bottom CTA */}
-      <div className="py-16 bg-gradient-to-r from-purple-600 to-indigo-600">
+      <div className="py-16 bg-purple-600">
         <div className="container mx-auto px-4 text-center text-white max-w-4xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-3xl md:text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Need Immediate Assistance?
           </h2>
           <p className="text-white/80 mb-8">Our support team is standing by to help you succeed.</p>
@@ -564,3 +593,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

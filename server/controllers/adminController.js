@@ -11,8 +11,30 @@ import {
   eventRejectedEmailTemplate
 } from '../utils/emailTemplates.js';
 
-export const getAllUsers = async (req, res) => {
+// Public — returns contact info from the first admin account
+export const getContactInfo = async (req, res) => {
   try {
+    const admin = await User.findOne({ role: 'admin' }).select('name email phone address');
+    if (!admin) {
+      return res.json({
+        email: 'support@eventme.com',
+        phone: '+91 0000000000',
+        address: 'EventMe HQ',
+        name: 'EventMe Support'
+      });
+    }
+    res.json({
+      name: admin.name,
+      email: admin.email,
+      phone: admin.phone || '+91 0000000000',
+      address: admin.address || 'EventMe HQ'
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllUsers = async (req, res) => {  try {
     const users = await User.find().select('-password');
     res.json(users);
   } catch (error) {

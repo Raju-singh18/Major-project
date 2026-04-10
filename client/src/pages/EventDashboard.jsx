@@ -77,13 +77,13 @@ const EventDashboard = () => {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gray-50">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
         <div className="container mx-auto px-4">
 
           {/* HEADER */}
           <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{data.event.title}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{data.event.title}</h1>
               <p className="text-gray-500">Event Dashboard</p>
             </div>
             <div className="flex gap-3">
@@ -126,7 +126,7 @@ const EventDashboard = () => {
           )}
 
           {/* STATS */}
-          <div className="grid md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
               { label: "Bookings", value: data.stats.totalBookings, sub: `${data.stats.confirmedBookings} confirmed`, icon: <FaTicketAlt /> },
               { label: "Revenue", value: `₹${data.stats.totalRevenue}`, icon: <FaDollarSign /> },

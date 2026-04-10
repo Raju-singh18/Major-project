@@ -166,9 +166,9 @@ const EventDetails = () => {
 
   // ── Loading skeleton ──────────────────────────────────────────────────────
   if (loading) return (
-    <div className="min-h-screen pt-16 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen pt-16 bg-gray-50">
       <div className="h-72 bg-gray-200 animate-pulse"></div>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
             <div className="h-8 w-2/3 bg-gray-200 rounded-xl animate-pulse"></div>
@@ -183,12 +183,12 @@ const EventDetails = () => {
 
   // ── Not found ─────────────────────────────────────────────────────────────
   if (!event) return (
-    <div className="min-h-screen pt-28 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen pt-20 sm:pt-28 flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="text-6xl mb-4">😕</div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Event Not Found</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Event Not Found</h2>
         <p className="text-gray-600 mb-6">This event doesn't exist or has been removed.</p>
-        <Link to="/events" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold">
+        <Link to="/events" className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-bold">
           <FaArrowLeft /> Browse Events
         </Link>
       </div>
@@ -217,7 +217,7 @@ const EventDetails = () => {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-gray-50">
 
         {/* ── Hero Image ─────────────────────────────────────────────────── */}
         <div className="relative h-72 md:h-[420px] overflow-hidden">
@@ -252,7 +252,7 @@ const EventDetails = () => {
           {/* Title overlay */}
           <div className="absolute bottom-0 left-0 right-0 px-4 md:px-8 pb-6">
             <div className="container mx-auto">
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              <h1 className="text-3xl md:text-3xl sm:text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3 leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 {event.title}
               </h1>
               <div className="flex flex-wrap gap-4 text-white/90 text-sm">
@@ -274,7 +274,7 @@ const EventDetails = () => {
         </div>
 
         {/* ── Main Content ───────────────────────────────────────────────── */}
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
           <div className="grid lg:grid-cols-3 gap-8">
 
             {/* Left — Details */}
@@ -283,13 +283,13 @@ const EventDetails = () => {
               {/* Info cards row */}
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
-                  { icon: FaCalendar, label: 'Date', value: new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }), color: 'from-purple-600 to-indigo-600' },
-                  { icon: FaClock, label: 'Time', value: event.time, color: 'from-blue-500 to-cyan-600' },
-                  { icon: FaMapMarkerAlt, label: 'Venue', value: `${event.location.venue}, ${event.location.address}`, color: 'from-orange-500 to-red-500' },
-                  { icon: FaUser, label: 'Organizer', value: event.organizer.name, color: 'from-green-500 to-emerald-600' },
+                  { icon: FaCalendar, label: 'Date', value: new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }), color: 'bg-purple-600' },
+                  { icon: FaClock, label: 'Time', value: event.time, color: 'bg-blue-600' },
+                  { icon: FaMapMarkerAlt, label: 'Venue', value: `${event.location.venue}, ${event.location.address}`, color: 'bg-orange-500' },
+                  { icon: FaUser, label: 'Organizer', value: event.organizer.name, color: 'bg-green-600' },
                 ].map(({ icon: Icon, label, value, color }) => (
                   <div key={label} className="bg-white border border-gray-200 rounded-2xl p-4 flex items-start gap-4">
-                    <div className={`w-10 h-10 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center flex-shrink-0`}>
                       <Icon className="text-white text-sm" />
                     </div>
                     <div>
@@ -339,7 +339,7 @@ const EventDetails = () => {
                     {relatedEvents.map((rel) => (
                       <Link key={rel._id} to={`/events/${rel._id}`} className="group border border-gray-200 rounded-xl overflow-hidden hover:border-purple-300">
                         <div className="relative h-36 overflow-hidden">
-                          <img src={rel.image} alt={rel.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <img src={rel.image} alt={rel.title} className="w-full h-full object-cover " />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                           <span className="absolute top-2 right-2 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-2 py-1 rounded-lg">
                             {rel.category}
@@ -361,7 +361,7 @@ const EventDetails = () => {
 
             {/* Right — Booking Card */}
             <div className="lg:col-span-1">
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 sticky top-20">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 sticky top-16 sm:top-20">
 
                 {/* ── Event Ended ─────────────────────────────────────── */}
                 {isEventPast && (
@@ -380,7 +380,7 @@ const EventDetails = () => {
                           e.preventDefault();
                           document.querySelector('#reviews-section')?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:from-amber-600 hover:to-orange-600 transition-all"
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-colors"
                       >
                         <FaStar /> Read Reviews
                       </a>
@@ -391,14 +391,14 @@ const EventDetails = () => {
                             e.preventDefault();
                             document.querySelector('#similar-events')?.scrollIntoView({ behavior: 'smooth' });
                           }}
-                          className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                          className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
                         >
                           <FaCalendar /> Browse Similar Events
                         </a>
                       )}
                       <Link
                         to="/events"
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-purple-200 text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-all"
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-white border-2 border-purple-200 text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-colors"
                       >
                         Explore Upcoming Events
                       </Link>
@@ -419,7 +419,7 @@ const EventDetails = () => {
                     <p className="text-sm text-gray-500 mb-5">This event has been cancelled by the organizer. If you booked tickets, you will receive a full refund.</p>
                     <Link
                       to="/events"
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold"
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-purple-600 text-white rounded-xl font-semibold"
                     >
                       Browse Other Events
                     </Link>
@@ -463,7 +463,7 @@ const EventDetails = () => {
                       <button
                         onClick={handleWishlistToggle}
                         disabled={wishlistLoading}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-semibold mb-3 hover:from-pink-600 hover:to-rose-600 transition-all"
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-pink-600 text-white rounded-xl font-semibold mb-3 hover:bg-pink-700 transition-colors"
                       >
                         {isInWishlist ? <FaHeart /> : <FaRegHeart />}
                         {isInWishlist ? 'Saved to Wishlist' : 'Save to Wishlist'}
@@ -569,8 +569,8 @@ const EventDetails = () => {
                       disabled={totalTickets === 0 || bookingLoading || user?.suspended}
                       className={`w-full py-3.5 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
                         totalAmount === 0
-                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600'
-                          : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700'
+                          ? 'bg-green-600 hover:bg-green-700'
+                          : 'bg-purple-600 hover:bg-purple-700'
                       }`}
                     >
                       {bookingLoading ? (
@@ -600,7 +600,7 @@ const EventDetails = () => {
                             handleMockPayment(bt);
                           }}
                           disabled={bookingLoading}
-                          className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                          className="w-full py-2.5 bg-orange-500 text-white rounded-xl font-bold text-sm disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           {bookingLoading
                             ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Processing...</>
@@ -633,3 +633,4 @@ const EventDetails = () => {
 };
 
 export default EventDetails;
+

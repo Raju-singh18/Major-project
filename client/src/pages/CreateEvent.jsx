@@ -21,16 +21,16 @@ const CreateEvent = () => {
 
   if (user && user.role === 'user') {
     return (
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-2xl w-full bg-white border border-gray-200 rounded-3xl p-8 md:p-12 text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-4xl">🚫</span>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Access Restricted</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>Access Restricted</h2>
           <p className="text-xl text-gray-700 mb-6">Only organizers and admins can create events.</p>
           <p className="text-gray-600 mb-8">Your account is registered as a <strong>User</strong>. Users can browse and book events, but cannot create them.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onClick={() => navigate('/events')} className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700">Browse Events</button>
+            <button onClick={() => navigate('/events')} className="px-8 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700">Browse Events</button>
             <button onClick={() => navigate('/dashboard')} className="px-8 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:border-purple-500 hover:text-purple-600">Go to Dashboard</button>
           </div>
         </div>
@@ -68,10 +68,10 @@ const CreateEvent = () => {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto bg-white border border-gray-200 rounded-2xl p-8">
-            <h1 className="text-3xl font-bold mb-6 text-gray-900">Create New Event</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900">Create New Event</h1>
 
             {user?.suspended && (
               <div className="bg-red-100 border-2 border-red-400 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-start gap-3">
@@ -84,7 +84,7 @@ const CreateEvent = () => {
             )}
 
             <form onSubmit={handleSubmit}>
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">Event Title</label>
                   <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})}
@@ -114,7 +114,7 @@ const CreateEvent = () => {
                   rows="4" required />
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">📅 Date</label>
                   <input type="date" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})}
@@ -127,7 +127,7 @@ const CreateEvent = () => {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">🏛️ Venue</label>
                   <input type="text" value={formData.venue} onChange={(e) => setFormData({...formData, venue: e.target.value})}
@@ -140,7 +140,7 @@ const CreateEvent = () => {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">🌆 City</label>
                   <input type="text" value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})}
@@ -164,7 +164,7 @@ const CreateEvent = () => {
               <div className="mb-6">
                 <h3 className="text-xl font-bold mb-4 text-gray-900">🎟️ Ticket Types</h3>
                 {ticketTypes.map((ticket, index) => (
-                  <div key={index} className="grid md:grid-cols-3 gap-4 mb-3 relative">
+                  <div key={index} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-3 relative">
                     <div>
                       <label className="block text-gray-700 font-semibold mb-2">Ticket Type</label>
                       <input type="text" placeholder="Ticket Name" value={ticket.name}
@@ -186,7 +186,7 @@ const CreateEvent = () => {
                       </div>
                       {ticketTypes.length > 1 && (
                         <button type="button" onClick={() => removeTicketType(index)}
-                          className="mb-0.5 w-10 h-10 flex items-center justify-center bg-red-50 border-2 border-red-200 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                          className="mb-0.5 w-10 h-10 flex items-center justify-center bg-red-50 border-2 border-red-200 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-colors">
                           ✕
                         </button>
                       )}
@@ -200,7 +200,7 @@ const CreateEvent = () => {
               </div>
 
               <button type="submit" disabled={user?.suspended || submitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-xl hover:from-purple-700 hover:to-indigo-700 font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                className="w-full bg-purple-600 text-white py-4 rounded-xl hover:bg-purple-700 font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {submitting
                   ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Creating...</>
                   : user?.suspended ? '🚫 Account Suspended' : '✨ Create Event'
@@ -215,3 +215,4 @@ const CreateEvent = () => {
 };
 
 export default CreateEvent;
+

@@ -83,9 +83,9 @@ const Notifications = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center pt-28 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen flex items-center justify-center pt-20 sm:pt-28 bg-gray-50">
       <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -99,7 +99,7 @@ const Notifications = () => {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           
@@ -107,7 +107,7 @@ const Notifications = () => {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">Notifications</h1>
+                <h1 className="text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Notifications</h1>
                 {unreadCount > 0 && (
                   <p className="text-gray-600">
                     You have <span className="font-bold text-purple-600">{unreadCount}</span> unread notification{unreadCount !== 1 ? 's' : ''}
@@ -117,7 +117,7 @@ const Notifications = () => {
               {notifications.some(n => !n.read) && (
                 <button
                   onClick={markAllAsRead}
-                  className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-purple-700 hover:to-indigo-700 hover:scale-105 transition-all font-bold"
+                  className="flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-700 transition-colors font-bold"
                 >
                   <FaCheckDouble /> Mark All Read
                 </button>
@@ -137,7 +137,7 @@ const Notifications = () => {
               {notifications.map((notification) => (
                 <div
                   key={notification._id}
-                  className={`bg-white border rounded-2xl p-6 hover:border-purple-300 transition-all ${
+                  className={`bg-white border rounded-2xl p-6 hover:border-purple-300 transition-colors ${
                     !notification.read 
                       ? 'border-purple-400 border-2 shadow-lg' 
                       : 'border-gray-200'
@@ -168,7 +168,7 @@ const Notifications = () => {
                           className="text-purple-600 hover:text-purple-700 font-semibold text-sm ml-12 inline-flex items-center gap-1 group"
                         >
                           View Event 
-                          <span className="group-hover:translate-x-1 transition-transform">→</span>
+                          <span className="group-hover:translate-x-1 ">→</span>
                         </Link>
                       )}
                     </div>
@@ -177,7 +177,7 @@ const Notifications = () => {
                       {!notification.read && (
                         <button
                           onClick={() => markAsRead(notification._id)}
-                          className="text-green-600 hover:text-white hover:bg-green-600 p-3 rounded-xl border-2 border-green-200 hover:border-green-600 transition-all"
+                          className="text-green-600 hover:text-white hover:bg-green-600 p-3 rounded-xl border-2 border-green-200 hover:border-green-600 transition-colors"
                           title="Mark as read"
                         >
                           <FaCheck />
@@ -185,7 +185,7 @@ const Notifications = () => {
                       )}
                       <button
                         onClick={() => deleteNotification(notification._id)}
-                        className="text-red-600 hover:text-white hover:bg-red-600 p-3 rounded-xl border-2 border-red-200 hover:border-red-600 transition-all"
+                        className="text-red-600 hover:text-white hover:bg-red-600 p-3 rounded-xl border-2 border-red-200 hover:border-red-600 transition-colors"
                         title="Delete"
                       >
                         <FaTrash />
@@ -201,25 +201,25 @@ const Notifications = () => {
           {notifications.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">
                   {notifications.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Total</div>
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">
                   {unreadCount}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Unread</div>
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-green-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">
                   {notifications.filter(n => n.read).length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Read</div>
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1">
                   {notifications.filter(n => n.type === 'booking').length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Bookings</div>
@@ -233,3 +233,4 @@ const Notifications = () => {
 };
 
 export default Notifications;
+

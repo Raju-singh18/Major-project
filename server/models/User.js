@@ -53,6 +53,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: 500
   },
+  address: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   suspended: {
     type: Boolean,
     default: false

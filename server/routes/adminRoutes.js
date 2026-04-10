@@ -12,12 +12,17 @@ import {
   suspendUser,
   unsuspendUser,
   deleteReview,
-  getAllReviews
+  getAllReviews,
+  getContactInfo
 } from '../controllers/adminController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+// Public route — no auth needed
+router.get('/contact-info', getContactInfo);
+
+// All routes below require admin auth
 router.use(protect, admin);
 
 router.get('/stats', getDashboardStats);

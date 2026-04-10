@@ -62,7 +62,7 @@ const UserDashboard = () => {
   };            
    
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center pt-28 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen flex items-center justify-center pt-20 sm:pt-28 bg-gray-50">
       <div className="text-center">
         <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
@@ -76,24 +76,24 @@ const UserDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
       
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-            Welcome back, <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">{user.name}</span>!
+        <div className="mb-6 sm:mb-10">
+          <h1 className="text-3xl sm:text-4xl md:text-3xl sm:text-2xl sm:text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+            Welcome back, <span className="bg-purple-600 bg-clip-text text-transparent">{user.name}</span>!
           </h1>
           <p className="text-gray-600 text-lg">Here's your event activity overview</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6 sm:mb-10">
           <div className="bg-white border border-gray-200 rounded-xl p-5 md:p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 mb-1 font-medium text-sm">Upcoming Events</p>
-                <p className="text-3xl md:text-4xl font-bold text-gray-900">{stats.upcomingBookings}</p>
+                <p className="text-3xl md:text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">{stats.upcomingBookings}</p>
               </div>
               <div className="w-12 h-12 md:w-14 md:h-14 bg-blue-100 rounded-xl flex items-center justify-center">
                 <FaCalendar className="text-blue-600 text-xl md:text-2xl" />
@@ -105,7 +105,7 @@ const UserDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 mb-1 font-medium text-sm">Past Events</p>
-                <p className="text-3xl md:text-4xl font-bold text-gray-900">{stats.pastBookings}</p>
+                <p className="text-3xl md:text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">{stats.pastBookings}</p>
               </div>
               <div className="w-12 h-12 md:w-14 md:h-14 bg-purple-100 rounded-xl flex items-center justify-center">
                 <FaTicketAlt className="text-purple-600 text-xl md:text-2xl" />
@@ -117,7 +117,7 @@ const UserDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 mb-1 font-medium text-sm">Total Spent</p>
-                <p className="text-3xl md:text-4xl font-bold text-gray-900">₹{stats.totalSpent}</p>
+                <p className="text-3xl md:text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">₹{stats.totalSpent}</p>
               </div>
               <div className="w-12 h-12 md:w-14 md:h-14 bg-green-100 rounded-xl flex items-center justify-center">
                 <FaStar className="text-green-600 text-xl md:text-2xl" />
@@ -129,7 +129,7 @@ const UserDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 mb-1 font-medium text-sm">Notifications</p>
-                <p className="text-3xl md:text-4xl font-bold text-gray-900">{stats.unreadNotifications}</p>
+                <p className="text-3xl md:text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">{stats.unreadNotifications}</p>
               </div>
               <div className="w-12 h-12 md:w-14 md:h-14 bg-orange-100 rounded-xl flex items-center justify-center">
                 <FaBell className="text-orange-600 text-xl md:text-2xl" />
@@ -139,7 +139,7 @@ const UserDashboard = () => {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-6 mb-10">
+        <div className="grid lg:grid-cols-2 gap-6 mb-6 sm:mb-10">
           {/* Upcoming Events */}
           <div className="bg-white border border-gray-200 rounded-2xl p-6">
             <div className="flex justify-between items-center mb-6">
@@ -246,9 +246,9 @@ const UserDashboard = () => {
         </div>
 
         {/* CTA Banner */}
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 md:p-10 text-white">
+        <div className="bg-purple-600 rounded-2xl p-6 sm:p-5 sm:p-8 md:p-10 text-white">
           <div className="max-w-3xl">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3">🎉 Discover More Events</h2>
+            <h2 className="text-3xl md:text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold mb-3">🎉 Discover More Events</h2>
             <p className="mb-6 text-white/90 text-lg">Find exciting events happening near you</p>
             <Link
               to="/events"
@@ -264,3 +264,4 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+

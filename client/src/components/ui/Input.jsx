@@ -22,7 +22,7 @@ const Input = ({
         <input
           className={`
             w-full px-6 py-4 bg-white border-2 rounded-2xl
-            transition-all duration-200 outline-none
+            transition-colors outline-none
             ${icon ? 'pl-12' : ''}
             ${error 
               ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-100' 
@@ -46,3 +46,4 @@ const Input = ({
 };
 
 export default Input;
+

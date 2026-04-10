@@ -6,7 +6,7 @@ const Card = ({
   className = '',
   ...props 
 }) => {
-  const baseClasses = 'rounded-3xl overflow-hidden transition-all duration-300';
+  const baseClasses = 'rounded-3xl overflow-hidden transition-colors';
   
   const variants = {
     default: 'bg-white shadow-card border border-gray-100',
@@ -43,3 +43,4 @@ const Card = ({
 };
 
 export default Card;
+

@@ -12,16 +12,16 @@ const Button = ({
   className = '',
   ...props 
 }) => {
-  const baseClasses = 'font-semibold rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'font-semibold rounded-2xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-lg hover:shadow-card-hover hover:-translate-y-1',
-    secondary: 'bg-gradient-to-r from-secondary-500 to-secondary-400 text-white shadow-lg hover:shadow-card-hover hover:-translate-y-1',
-    outline: 'border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white',
-    ghost: 'text-primary-500 hover:bg-primary-50',
-    glass: 'glass text-dark-900 hover:bg-white/50',
-    danger: 'bg-red-500 text-white hover:bg-red-600',
-    success: 'bg-green-500 text-white hover:bg-green-600',
+    primary: 'bg-purple-600 text-white hover:bg-purple-700',
+    secondary: 'bg-violet-700 text-white hover:bg-violet-800',
+    outline: 'border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white',
+    ghost: 'text-purple-600 hover:bg-purple-50',
+    glass: 'bg-white/30 text-gray-900 hover:bg-white/50',
+    danger: 'bg-red-600 text-white hover:bg-red-700',
+    success: 'bg-green-600 text-white hover:bg-green-700',
   };
 
   const sizes = {

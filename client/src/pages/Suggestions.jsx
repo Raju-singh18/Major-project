@@ -113,8 +113,8 @@ export default function Suggestions() {
   // ── Upcoming event card ────────────────────────────────────────────────────
   const SuggestionCard = ({ event }) => (
     <Link to={`/events/${event._id}`} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 transition-colors">
-      <div className="relative h-64 overflow-hidden">
-        <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+      <div className="relative h-48 sm:h-48 sm:h-64 overflow-hidden">
+        <img src={event.image} alt={event.title} className="w-full h-full object-cover " />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <div className="absolute top-3 right-3 flex gap-2">
           <button onClick={(e) => { e.preventDefault(); toggleFavorite(event._id); }}
@@ -170,10 +170,10 @@ export default function Suggestions() {
     const fullStars = Math.floor(stars);
 
     return (
-      <Link to={`/events/${event._id}`} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 hover:shadow-lg transition-all flex flex-col">
+      <Link to={`/events/${event._id}`} className="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 hover:shadow-lg transition-colors flex flex-col">
         {/* Image */}
         <div className="relative h-44 overflow-hidden flex-shrink-0">
-          <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <img src={event.image} alt={event.title} className="w-full h-full object-cover " />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
           {/* Past badge */}
@@ -277,17 +277,17 @@ export default function Suggestions() {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
         <div className="container mx-auto px-4">
 
           {/* Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-6 sm:mb-10">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center">
                 <FaLightbulb className="text-2xl text-white" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-                Event <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Suggestions</span>
+              <h1 className="text-3xl sm:text-4xl md:text-3xl sm:text-2xl sm:text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900">
+                Event <span className="bg-purple-600 bg-clip-text text-transparent">Suggestions</span>
               </h1>
             </div>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">Personalized recommendations just for you</p>
@@ -301,7 +301,7 @@ export default function Suggestions() {
 
           {/* Stats Bar */}
           {!loading && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 sm:mb-10">
               {[
                 { label: 'Trending', value: suggestions.trending.length, color: 'text-purple-600' },
                 { label: 'Popular', value: suggestions.popular.length, color: 'text-yellow-600' },
@@ -309,7 +309,7 @@ export default function Suggestions() {
                 { label: 'Favorites', value: favorites.length, color: 'text-red-600' },
               ].map(s => (
                 <div key={s.label} className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                  <div className={`text-3xl font-bold mb-1 ${s.color}`}>{s.value}</div>
+                  <div className={`text-2xl sm:text-3xl font-bold mb-1 ${s.color}`}>{s.value}</div>
                   <div className="text-sm text-gray-600 font-medium">{s.label}</div>
                 </div>
               ))}
@@ -358,7 +358,7 @@ export default function Suggestions() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
               <div>
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="w-10 h-10 bg-gradient-to-br from-gray-700 to-gray-900 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center">
                     <FaHistory className="text-white text-sm" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900">Past Events</h2>
@@ -388,7 +388,7 @@ export default function Suggestions() {
 
             {/* Social proof banner */}
             {!pastLoading && pastEvents.length > 0 && (
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl px-6 py-4 mb-6 flex flex-wrap items-center gap-6">
+              <div className="bg-purple-50 border border-purple-200 rounded-2xl px-6 py-4 mb-6 flex flex-wrap items-center gap-6">
                 <div className="flex items-center gap-2">
                   <FaUsers className="text-purple-500" />
                   <span className="text-sm font-semibold text-gray-700">
@@ -451,11 +451,11 @@ export default function Suggestions() {
           </div>
 
           {/* CTA */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">Can't find what you're looking for?</h3>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 text-center">
+            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Can't find what you're looking for?</h3>
             <p className="text-gray-600 mb-8 text-lg">Browse all events or create your own experience</p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <Link to="/events" className="px-8 py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors flex items-center gap-2">
+              <Link to="/events" className="px-5 sm:px-8 py-3 sm:py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors flex items-center gap-2">
                 Browse All Events <FaArrowRight />
               </Link>
               {user && (
@@ -471,3 +471,4 @@ export default function Suggestions() {
     </>
   );
 }
+

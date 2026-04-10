@@ -91,17 +91,17 @@ const EventCard = ({ event, onWishlistChange, showToast }) => {
 
   return (
     <Link to={`/events/${event._id}`} className="block group">
-      <div className="glass-card rounded-3xl overflow-hidden hover-lift transition-all duration-500 border border-gray-100">
+      <div className="glass-card rounded-3xl overflow-hidden hover-lift transition-colors duration-500 border border-gray-100">
         {/* Image Container */}
         <div className="relative h-56 overflow-hidden">
           {event.image ? (
             <img 
               src={event.image} 
               alt={event.title} 
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+              className="w-full h-full object-cover object-cover" 
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center">
+            <div className="w-full h-full bg-purple-600 flex items-center justify-center">
               <FaCalendar className="text-white text-6xl opacity-50" />
             </div>
           )}
@@ -112,7 +112,7 @@ const EventCard = ({ event, onWishlistChange, showToast }) => {
             <button
               onClick={handleWishlistToggle}
               disabled={isLoading}
-              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-300 shadow-lg z-10 group/wishlist"
+              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-lg z-10 group/wishlist"
               title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
               {isInWishlist ? (
@@ -151,13 +151,13 @@ const EventCard = ({ event, onWishlistChange, showToast }) => {
           {/* Meta Info */}
           <div className="space-y-2 mb-4">
             <div className="flex items-center gap-2 text-dark-600 text-sm">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-400 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaClock className="text-white text-xs" />
               </div>
               <span>{event.time}</span>
             </div>
             <div className="flex items-center gap-2 text-dark-600 text-sm">
-              <div className="w-8 h-8 bg-gradient-to-br from-secondary-500 to-secondary-400 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-violet-700 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaMapMarkerAlt className="text-white text-xs" />
               </div>
               <span className="line-clamp-1">{event.location?.city || 'Location'}, {event.location?.country || 'Country'}</span>
@@ -190,3 +190,4 @@ const EventCard = ({ event, onWishlistChange, showToast }) => {
 };
 
 export default EventCard;
+

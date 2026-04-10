@@ -31,12 +31,12 @@ const VerifyEmail = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#5A43FF] to-[#FF8F00] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-purple-700 p-4">
       <div className="glass rounded-3xl p-8 md:p-12 max-w-md w-full text-center animate-fade-in">
         {status === 'verifying' && (
           <>
             <FaSpinner className="text-6xl text-white mx-auto mb-6 animate-spin" />
-            <h1 className="text-3xl font-bold text-white mb-4">Verifying Email...</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">Verifying Email...</h1>
             <p className="text-white/80">Please wait while we verify your email address.</p>
           </>
         )}
@@ -44,7 +44,7 @@ const VerifyEmail = () => {
         {status === 'success' && (
           <>
             <FaCheckCircle className="text-6xl text-green-400 mx-auto mb-6 animate-scale" />
-            <h1 className="text-3xl font-bold text-white mb-4">Email Verified!</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">Email Verified!</h1>
             <p className="text-white/90 mb-6">{message}</p>
             <p className="text-white/80 mb-4">Redirecting to login...</p>
             <Link 
@@ -59,7 +59,7 @@ const VerifyEmail = () => {
         {status === 'error' && (
           <>
             <FaTimesCircle className="text-6xl text-red-400 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-white mb-4">Verification Failed</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4">Verification Failed</h1>
             <p className="text-white/90 mb-6">{message}</p>
             <div className="space-y-3">
               <Link 

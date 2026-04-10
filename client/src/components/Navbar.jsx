@@ -1,7 +1,7 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { FaCalendarAlt, FaUser, FaSignOutAlt, FaBell, FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { FaCalendarAlt, FaUser, FaSignOutAlt, FaBell, FaBars, FaTimes, FaChevronDown, FaEnvelope, FaQuestionCircle, FaComments, FaHeadset } from 'react-icons/fa';
 import api from '../config/api';
 
 const Navbar = () => {
@@ -10,6 +10,8 @@ const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
+  const supportRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -61,6 +63,17 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
+  // Close support dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (supportRef.current && !supportRef.current.contains(e.target)) {
+        setSupportOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const isActive = (path) => location.pathname === path;
 
   const NavLink = ({ to, children, mobile = false }) => (
@@ -75,22 +88,22 @@ const Navbar = () => {
     >
       {children}
       {!mobile && (
-        <span className={`absolute bottom-0 left-3 right-3 h-0.5 bg-purple-600 rounded-full transition-all duration-200 ${isActive(to) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span>
+        <span className={`absolute bottom-0 left-3 right-3 h-0.5 bg-purple-600 rounded-full transition-colors ${isActive(to) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span>
       )}
     </Link>
   );
 
   return (
-    <nav className={`fixed w-full z-[100] transition-all duration-300 ${visible ? 'top-0' : '-top-24'} bg-white border-b ${scrolled ? 'border-gray-200 shadow-sm' : 'border-gray-100'}`}>
-      {/* Single clean bottom accent line matching home page purple */}
-      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-600 to-indigo-600"></div>
+    <nav className={`fixed w-full z-[100] transition-colors ${visible ? 'top-0' : '-top-24'} bg-white border-b ${scrolled ? 'border-gray-200 shadow-sm' : 'border-gray-100'}`}>
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-purple-600"></div>
 
       <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-9 h-9 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
+            <div className="w-9 h-9 bg-purple-600 rounded-xl flex items-center justify-center">
               <FaCalendarAlt className="text-white text-base" />
             </div>
             <div className="hidden sm:block">
@@ -113,7 +126,7 @@ const Navbar = () => {
                       Admin
                     </Link>
                     <NavLink to="/create-event">Create</NavLink>
-                    <NavLink to="/my-events">My Events</NavLink>
+                    <NavLink to="/my-events">MyEvents</NavLink>
                     <NavLink to="/wishlists">Wishlists</NavLink>
                     <NavLink to="/my-bookings">Bookings</NavLink>
                   </>
@@ -122,7 +135,8 @@ const Navbar = () => {
                 {user.role === 'organizer' && (
                   <>
                     <NavLink to="/create-event">Create</NavLink>
-                    <NavLink to="/my-events">My Events</NavLink>
+                    <NavLink to="/dashboard">Dashboard</NavLink>
+                    <NavLink to="/my-events">MyEvents</NavLink>
                     <NavLink to="/my-bookings">Bookings</NavLink>
                     <NavLink to="/wishlists">Wishlists</NavLink>
                   </>
@@ -136,7 +150,59 @@ const Navbar = () => {
                   </>
                 )}
 
-                <NavLink to="/contact">Contact</NavLink>
+                {/* Support dropdown */}
+                <div className="relative" ref={supportRef}>
+                  <button
+                    onClick={() => setSupportOpen(!supportOpen)}
+                    className={`flex items-center gap-1 px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${supportOpen || isActive('/contact') ? 'text-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                  >
+                    <FaHeadset className="text-sm" />
+                    Support
+                    <FaChevronDown className={`text-xs transition-colors duration-200 ${supportOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {supportOpen && (
+                    <div className="absolute right-0 mt-1.5 w-52 bg-white rounded-xl border border-gray-200 shadow-lg py-1.5 z-[110]">
+                      <div className="px-3 py-1.5 border-b border-gray-100 mb-1">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Help & Support</p>
+                      </div>
+                      <Link
+                        to="/contact"
+                        onClick={() => setSupportOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                      >
+                        <FaEnvelope className="text-purple-500 text-xs flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold leading-tight">Contact Us</p>
+                          <p className="text-xs text-gray-400">Send us a message</p>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/contact#faq"
+                        onClick={() => { setSupportOpen(false); setTimeout(() => document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' }), 100); }}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                      >
+                        <FaQuestionCircle className="text-blue-500 text-xs flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold leading-tight">FAQ</p>
+                          <p className="text-xs text-gray-400">Common questions</p>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/contact"
+                        state={{ openChat: true }}
+                        onClick={() => setSupportOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                      >
+                        <FaComments className="text-green-500 text-xs flex-shrink-0" />
+                        <div>
+                          <p className="font-semibold leading-tight">Live Chat</p>
+                          <p className="text-xs text-gray-400">Chat with AI support</p>
+                        </div>
+                      </Link>
+                    </div>
+                  )}
+                </div>
 
                 {/* Bell */}
                 <Link to="/notifications" className="relative p-2 rounded-lg hover:bg-gray-100 ml-1">
@@ -155,9 +221,9 @@ const Navbar = () => {
                     className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100"
                   >
                     <div className={`w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${
-                      user.role === 'admin' ? 'bg-gradient-to-br from-purple-600 to-pink-600'
-                      : user.role === 'organizer' ? 'bg-gradient-to-br from-orange-500 to-red-500'
-                      : 'bg-gradient-to-br from-purple-600 to-indigo-600'
+                      user.role === 'admin' ? 'bg-purple-700'
+                      : user.role === 'organizer' ? 'bg-orange-500'
+                      : 'bg-purple-600'
                     }`}>
                       {user.avatar && !user.avatar.includes('placeholder') ? (
                         <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
@@ -169,11 +235,11 @@ const Navbar = () => {
                       <span className="text-sm font-semibold text-gray-900 block leading-tight">{user.name || user.email}</span>
                       <span className="text-xs text-gray-500 capitalize">{user.role}</span>
                     </div>
-                    <FaChevronDown className={`text-xs text-gray-500 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                    <FaChevronDown className={`text-xs text-gray-500  duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-1.5 w-56 bg-white rounded-xl border border-gray-200 shadow-lg py-1 z-[110]">
+                    <div className="absolute right-0 mt-1.5 w-56 max-w-[calc(100vw-2rem)] bg-white rounded-xl border border-gray-200 shadow-lg py-1 z-[110]">
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="text-xs text-gray-500 mb-0.5">Signed in as</p>
                         <p className="text-sm font-semibold text-gray-900 truncate">{user.email}</p>
@@ -210,11 +276,40 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <NavLink to="/contact">Contact</NavLink>
+                {/* Support dropdown (logged out) */}
+                <div className="relative" ref={supportRef}>
+                  <button
+                    onClick={() => setSupportOpen(!supportOpen)}
+                    className={`flex items-center gap-1 px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${supportOpen || isActive('/contact') ? 'text-purple-600' : 'text-gray-700 hover:text-purple-600'}`}
+                  >
+                    <FaHeadset className="text-sm" />
+                    Support
+                    <FaChevronDown className={`text-xs duration-200 ${supportOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {supportOpen && (
+                    <div className="absolute right-0 mt-1.5 w-52 bg-white rounded-xl border border-gray-200 shadow-lg py-1.5 z-[110]">
+                      <div className="px-3 py-1.5 border-b border-gray-100 mb-1">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Help & Support</p>
+                      </div>
+                      <Link to="/contact" onClick={() => setSupportOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+                        <FaEnvelope className="text-purple-500 text-xs flex-shrink-0" />
+                        <div><p className="font-semibold leading-tight">Contact Us</p><p className="text-xs text-gray-400">Send us a message</p></div>
+                      </Link>
+                      <Link to="/contact#faq" onClick={() => { setSupportOpen(false); setTimeout(() => document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+                        <FaQuestionCircle className="text-blue-500 text-xs flex-shrink-0" />
+                        <div><p className="font-semibold leading-tight">FAQ</p><p className="text-xs text-gray-400">Common questions</p></div>
+                      </Link>
+                      <Link to="/contact" state={{ openChat: true }} onClick={() => setSupportOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+                        <FaComments className="text-green-500 text-xs flex-shrink-0" />
+                        <div><p className="font-semibold leading-tight">Live Chat</p><p className="text-xs text-gray-400">Chat with AI support</p></div>
+                      </Link>
+                    </div>
+                  )}
+                </div>
                 <Link to="/login" className="text-sm font-semibold text-gray-700 px-4 py-2 rounded-lg border border-gray-300 hover:border-purple-500 hover:text-purple-600 ml-2">
                   Login
                 </Link>
-                <Link to="/register" className="text-sm font-semibold px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 ml-1">
+                <Link to="/register" className="text-sm font-semibold px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 ml-1">
                   Sign Up
                 </Link>
               </>
@@ -235,7 +330,27 @@ const Navbar = () => {
           <div className="lg:hidden border-t border-gray-100 py-3 space-y-0.5">
             <NavLink to="/events" mobile>Browse Events</NavLink>
             <NavLink to="/suggestions" mobile>Suggestions</NavLink>
-            <NavLink to="/contact" mobile>Contact</NavLink>
+
+            {/* Mobile support links */}
+            <div className="px-4 pt-2 pb-1">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Support</span>
+            </div>
+            <NavLink to="/contact" mobile>Contact Us</NavLink>
+            <Link
+              to="/contact#faq"
+              onClick={() => { setMobileMenuOpen(false); setTimeout(() => document.getElementById('faq-section')?.scrollIntoView({ behavior: 'smooth' }), 200); }}
+              className="block py-3 px-4 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-purple-600"
+            >
+              FAQ
+            </Link>
+            <Link
+              to="/contact"
+              state={{ openChat: true }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="block py-3 px-4 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-purple-600"
+            >
+              Live Chat
+            </Link>
 
             {user ? (
               <>
@@ -286,7 +401,7 @@ const Navbar = () => {
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 text-center text-sm font-bold text-purple-600 border border-purple-300 rounded-lg">
                   Login
                 </Link>
-                <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 text-center text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg">
+                <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 text-center text-sm font-bold text-white bg-purple-600 rounded-lg">
                   Sign Up
                 </Link>
               </div>
@@ -299,3 +414,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

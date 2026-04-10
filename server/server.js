@@ -15,6 +15,7 @@ import wishlistRoutes from './routes/wishlistRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import heroSlideRoutes from './routes/heroSlideRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import legalRoutes from './routes/legalRoutes.js';
 import fileUpload from 'express-fileupload';
 
 dotenv.config();
@@ -56,6 +57,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/hero-slides', heroSlideRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/legal', legalRoutes);
 
 // Alias routes for API requirement compatibility
 app.use('/api/user', authRoutes); // Alias for /api/auth

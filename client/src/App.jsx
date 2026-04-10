@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -23,12 +24,15 @@ import ResetPassword from './pages/ResetPassword';
 import Footer from './components/Footer';
 import PrivateRoute from './components/PrivateRoute';
 import Wishlists from './pages/Wishlists';
-
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import OrganizerDashboard from './pages/OrganizerDashboard';
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="min-h-screen flex flex-col relative">
+          <ScrollToTop />
           <Navbar />
           <div className="flex-grow relative">
             <Routes>
@@ -38,6 +42,9 @@ function App() {
             <Route path="/events" element={<Events />} />
             <Route path="/suggestions" element={<Suggestions />} />
             <Route path="/events/:id" element={<EventDetails />} />
+            <Route path='/privacy-policy' element={<PrivacyPolicy/>}/>
+            <Route path='/terms-of-services' element={<TermsOfService/>}/>
+            <Route path="/organizer-dashboard" element={<PrivateRoute><OrganizerDashboard /></PrivateRoute>} />
             <Route path="/create-event" element={<PrivateRoute><CreateEvent /></PrivateRoute>} />
             <Route path="/my-events" element={<PrivateRoute><MyEvents /></PrivateRoute>} />
             <Route path="/my-bookings" element={<PrivateRoute><MyBookings /></PrivateRoute>} />

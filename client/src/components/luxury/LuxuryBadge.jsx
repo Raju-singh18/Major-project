@@ -5,7 +5,7 @@ const LuxuryBadge = ({
   dot = false,
   className = '' 
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-semibold transition-all duration-300';
+  const baseClasses = 'inline-flex items-center justify-center font-semibold transition-colors';
   
   const variants = {
     primary: 'bg-royal-primary/10 text-royal-primary border border-royal-primary/20',
@@ -51,3 +51,4 @@ const LuxuryBadge = ({
 };
 
 export default LuxuryBadge;
+

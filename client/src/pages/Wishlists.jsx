@@ -66,11 +66,11 @@ const Wishlists = () => {
     return (
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 transition-colors">
         <Link to={`/events/${event._id}`}>
-          <div className="relative h-64 overflow-hidden">
+          <div className="relative h-48 sm:h-48 sm:h-64 overflow-hidden">
             <img 
               src={event.image} 
               alt={event.title} 
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+              className="w-full h-full object-cover " 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
             
@@ -139,9 +139,9 @@ const Wishlists = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-28 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen flex items-center justify-center pt-20 sm:pt-28 bg-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <FaHeart className="text-white text-2xl" />
           </div>
           <p className="text-gray-700 font-medium text-lg">Loading your wishlist...</p>
@@ -153,20 +153,20 @@ const Wishlists = () => {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
       
       <div className="container mx-auto px-4">
         
         {/* Header */}
-        <div className="mb-10">
+        <div className="mb-6 sm:mb-10">
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center">
                 <FaHeart className="text-2xl text-white" />
               </div>
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-                  My <span className="bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">Wishlist</span>
+                <h1 className="text-3xl sm:text-4xl md:text-3xl sm:text-2xl sm:text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900">
+                  My <span className="bg-red-600 bg-clip-text text-transparent">Wishlist</span>
                 </h1>
               </div>
             </div>
@@ -191,21 +191,21 @@ const Wishlists = () => {
 
         {/* Stats Cards */}
         {wishlist.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 sm:mb-10">
             <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-              <div className="text-3xl font-bold text-red-600 mb-1">{stats.total}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-red-600 mb-1">{stats.total}</div>
               <div className="text-sm text-gray-600 font-medium">Saved Events</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-1">{stats.categories}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">{stats.categories}</div>
               <div className="text-sm text-gray-600 font-medium">Categories</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-              <div className="text-3xl font-bold text-green-600 mb-1">{stats.upcoming}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">{stats.upcoming}</div>
               <div className="text-sm text-gray-600 font-medium">Upcoming</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-              <div className="text-3xl font-bold text-gray-600 mb-1">{stats.past}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-600 mb-1">{stats.past}</div>
               <div className="text-sm text-gray-600 font-medium">Past Events</div>
             </div>
           </div>
@@ -215,16 +215,16 @@ const Wishlists = () => {
         {wishlist.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
             <div className="max-w-md mx-auto">
-              <div className="w-28 h-28 bg-gradient-to-br from-red-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-8">
+              <div className="w-28 h-28 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-8">
                 <FaHeart className="text-red-400 text-5xl" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h2>
+              <h2 className="text-3xl md:text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h2>
               <p className="text-gray-600 mb-8 text-lg leading-relaxed">
                 Discover amazing events and save your favorites by clicking the heart icon on any event card.
               </p>
               <Link
                 to="/events"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                className="inline-flex items-center gap-3 px-5 sm:px-8 py-3 sm:py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors"
               >
                 <FaCalendarAlt />
                 Browse Events
@@ -234,15 +234,15 @@ const Wishlists = () => {
         ) : (
           <>
             {/* Events Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 sm:mb-12">
               {wishlist.map((event) => (
                 <WishlistCard key={event._id} event={event} />
               ))}
             </div>
 
             {/* CTA Section */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-10 text-center">
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 Ready to Book?
               </h3>
               <p className="text-gray-600 mb-8 text-lg">
@@ -251,7 +251,7 @@ const Wishlists = () => {
               <div className="flex gap-4 justify-center flex-wrap">
                 <Link
                   to="/events"
-                  className="px-8 py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors flex items-center gap-2"
+                  className="px-5 sm:px-8 py-3 sm:py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-colors flex items-center gap-2"
                 >
                   Browse More Events <FaArrowRight />
                 </Link>
@@ -271,10 +271,10 @@ const Wishlists = () => {
         {showClearModal && (
           <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl p-8 max-w-md w-full border border-gray-200">
-              <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <FaTrash className="text-white text-3xl" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 text-center">
                 Clear Wishlist?
               </h3>
               <p className="text-gray-600 mb-8 text-center leading-relaxed">
@@ -289,7 +289,7 @@ const Wishlists = () => {
                 </button>
                 <button
                   onClick={handleClearWishlist}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-600 transition-colors"
+                  className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-colors"
                 >
                   Clear All
                 </button>
@@ -304,3 +304,4 @@ const Wishlists = () => {
 };
 
 export default Wishlists;
+

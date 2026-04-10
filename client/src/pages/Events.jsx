@@ -293,106 +293,86 @@ export default function Events() {
   const filteredEvents = getFilteredAndSortedEvents();
 
   const EventCard = ({ event }) => (
-    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 transition-colors group">
-      <Link to={`/events/${event._id}`}>
-        <div className="relative h-64 overflow-hidden">
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 transition-colors flex flex-col">
+      <Link to={`/events/${event._id}`} className="flex flex-col flex-1">
+        {/* Image */}
+        <div className="relative h-44 sm:h-48 overflow-hidden flex-shrink-0">
           <img
             src={event.image}
             alt={event.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
-          {/* Quick Actions */}
-          <div className="absolute top-3 right-3 flex gap-2">
+          {/* Top-left: Quick View + Category */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                toggleWishlist(event._id);
-              }}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-                wishlist.includes(event._id)
-                  ? 'bg-red-500 text-white'
-                  : 'bg-white text-gray-700 hover:bg-red-500 hover:text-white'
-              }`}
-              title="Add to wishlist"
+              onClick={(e) => { e.preventDefault(); openQuickView(event); }}
+              className="px-2.5 py-1 bg-white/95 rounded-full text-gray-800 font-semibold text-xs flex items-center gap-1 hover:bg-purple-600 hover:text-white transition-colors w-fit"
             >
-              <FaHeart className="text-sm" />
+              <FaEye className="text-xs" /> Quick View
             </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                toggleBookmark(event._id);
-              }}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-                bookmarked.includes(event._id)
-                  ? 'bg-yellow-500 text-white'
-                  : 'bg-white text-gray-700 hover:bg-yellow-500 hover:text-white'
-              }`}
-              title="Bookmark"
-            >
-              <FaBookmark className="text-sm" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                shareEvent(event);
-              }}
-              className="w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"
-              title="Share"
-            >
-              <FaShare className="text-sm" />
-            </button>
-          </div>
-
-          {/* Quick View Button */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              openQuickView(event);
-            }}
-            className="absolute top-3 left-3 px-3 py-1 bg-white/95 rounded-full text-gray-800 font-semibold text-xs flex items-center gap-1 hover:bg-purple-600 hover:text-white transition-colors"
-          >
-            <FaEye /> Quick View
-          </button>
-
-          {/* Category Badge */}
-          <div className="absolute top-12 left-3">
-            <span className="px-3 py-1 bg-white/95 rounded-full text-gray-800 font-semibold text-xs">
+            <span className="px-2.5 py-1 bg-white/95 rounded-full text-gray-800 font-semibold text-xs w-fit">
               {event.category}
             </span>
           </div>
 
-          {/* Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="text-lg font-bold text-white mb-2 line-clamp-2">
-              {event.title}
-            </h3>
-            <div className="space-y-1 mb-3">
-              <div className="flex items-center gap-2 text-white text-sm">
-                <FaCalendar className="text-purple-300" />
-                <span>
-                  {new Date(event.date).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-white text-sm">
-                <FaMapMarkerAlt className="text-purple-300" />
-                <span className="line-clamp-1">{event.location?.city}, {event.location?.country}</span>
-              </div>
+          {/* Top-right: Action buttons */}
+          <div className="absolute top-3 right-3 flex gap-1.5">
+            <button
+              onClick={(e) => { e.preventDefault(); toggleWishlist(event._id); }}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                wishlist.includes(event._id) ? 'bg-red-500 text-white' : 'bg-white text-gray-700 hover:bg-red-500 hover:text-white'
+              }`}
+              title="Add to wishlist"
+            >
+              <FaHeart className="text-xs" />
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); toggleBookmark(event._id); }}
+              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                bookmarked.includes(event._id) ? 'bg-yellow-500 text-white' : 'bg-white text-gray-700 hover:bg-yellow-500 hover:text-white'
+              }`}
+              title="Bookmark"
+            >
+              <FaBookmark className="text-xs" />
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); shareEvent(event); }}
+              className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-blue-500 hover:text-white transition-colors"
+              title="Share"
+            >
+              <FaShare className="text-xs" />
+            </button>
+          </div>
+
+          {/* Bottom-left: Price badge */}
+          <div className="absolute bottom-3 left-3">
+            <span className="px-3 py-1 bg-purple-600 text-white rounded-full text-sm font-bold">
+              {event.minPrice === 0 ? 'FREE' : `₹${event.minPrice}`}
+            </span>
+          </div>
+        </div>
+
+        {/* Card body — below image, no overlap */}
+        <div className="p-4 flex flex-col flex-1">
+          <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 leading-snug">
+            {event.title}
+          </h3>
+          <div className="space-y-1.5 mb-3 flex-1">
+            <div className="flex items-center gap-2 text-gray-500 text-xs">
+              <FaCalendar className="text-purple-500 flex-shrink-0" />
+              <span>{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
-            <div className="flex items-center justify-between pt-3 border-t border-white/30">
-              <div>
-                <span className="text-white/80 text-xs">From</span>
-                <div className="text-white font-bold text-xl">₹{event.minPrice}</div>
-              </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors text-sm">
-                Book <FaArrowRight className="text-xs" />
-              </button>
+            <div className="flex items-center gap-2 text-gray-500 text-xs">
+              <FaMapMarkerAlt className="text-purple-500 flex-shrink-0" />
+              <span className="truncate">{event.location?.city}, {event.location?.country}</span>
             </div>
+          </div>
+          <div className="pt-3 border-t border-gray-100">
+            <span className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold text-sm hover:bg-purple-700 transition-colors">
+              Book Now <FaArrowRight className="text-xs" />
+            </span>
           </div>
         </div>
       </Link>
@@ -467,7 +447,7 @@ export default function Events() {
             </div>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-4 mb-4">
+          <div className="grid sm:grid-cols-2 gap-4 mb-4">
             <div className="flex items-center gap-2 text-gray-700">
               <FaCalendar className="text-purple-600" />
               <span>
@@ -487,7 +467,7 @@ export default function Events() {
           <div className="flex items-center justify-between pt-4 border-t border-gray-200">
             <div>
               <span className="text-gray-600 text-sm">Starting from</span>
-              <div className="text-3xl font-bold text-purple-600">₹{event.minPrice}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-purple-600">₹{event.minPrice}</div>
             </div>
             <button className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors">
               Book Now <FaArrowRight />
@@ -524,7 +504,7 @@ export default function Events() {
           </div>
           
           <div className="p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">{quickViewEvent.title}</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">{quickViewEvent.title}</h2>
             <p className="text-gray-600 mb-6">{quickViewEvent.description}</p>
             
             <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -610,14 +590,14 @@ export default function Events() {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
 
         <div className="container mx-auto px-4">
 
           {/* Header Section */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-              Discover Amazing <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Events</span>
+          <div className="text-center mb-6 sm:mb-10">
+            <h1 className="text-3xl sm:text-4xl md:text-3xl sm:text-2xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+              Discover Amazing <span className="bg-purple-600 bg-clip-text text-transparent">Events</span>
             </h1>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">
               Find and book the perfect experience for you
@@ -626,7 +606,7 @@ export default function Events() {
             {user && (
               <Link
                 to="/create-event"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:from-orange-600 hover:to-orange-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-colors"
               >
                 <span>✨</span>
                 Create Your Event
@@ -637,23 +617,23 @@ export default function Events() {
 
           {/* Featured Events */}
           {featuredEvents.length > 0 && (
-            <div className="mb-10">
+            <div className="mb-6 sm:mb-10">
               <div className="flex items-center gap-3 mb-6">
                 <FaFire className="text-3xl text-orange-500" />
-                <h2 className="text-3xl font-bold text-gray-900">Featured Events</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Featured Events</h2>
               </div>
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {featuredEvents.map((event) => (
                   <Link
                     key={event._id}
                     to={`/events/${event._id}`}
                     className="group relative overflow-hidden rounded-2xl border border-gray-200 hover:border-purple-300 transition-colors"
                   >
-                    <div className="relative h-80">
+                    <div className="relative h-56 sm:h-80">
                       <img
                         src={event.image}
                         alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover "
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
@@ -717,7 +697,7 @@ export default function Events() {
               {/* Advanced Filters */}
               {showFilters && (
                 <div className="border-t border-gray-200 pt-6">
-                  <div className="grid md:grid-cols-4 gap-6 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 
                     {/* City Filter */}
                     <div>
@@ -844,7 +824,7 @@ export default function Events() {
 
                 <Link
                   to="/suggestions"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-colors text-sm"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors text-sm"
                 >
                   Suggestions
                 </Link>
@@ -911,8 +891,8 @@ export default function Events() {
             </div>
           ) : (
             <div className={viewMode === 'grid' 
-              ? 'grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12' 
-              : 'space-y-4 mb-12'
+              ? 'grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 sm:mb-12' 
+              : 'space-y-4 mb-6 sm:mb-12'
             }>
               {filteredEvents.map((event) => (
                 viewMode === 'grid' ? (
@@ -926,27 +906,27 @@ export default function Events() {
 
           {/* Stats Section */}
           {!loading && filteredEvents.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 sm:mb-12">
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">
                   {filteredEvents.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Total Events</div>
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-green-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">
                   {filteredEvents.filter(e => e.availableSeats > 0).length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Available</div>
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1">
                   {categories.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Categories</div>
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                <div className="text-3xl font-bold text-red-600 mb-1">
+                <div className="text-2xl sm:text-3xl font-bold text-red-600 mb-1">
                   {wishlist.length}
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Favorites</div>
@@ -956,10 +936,10 @@ export default function Events() {
 
           {/* You Might Also Like Section */}
           {!loading && suggestedEvents.length > 0 && (
-            <div className="mb-12">
+            <div className="mb-6 sm:mb-12">
               <div className="flex items-center gap-3 mb-6">
                 <FaFire className="text-3xl text-orange-500" />
-                <h2 className="text-3xl font-bold text-gray-900">You Might Also Like</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">You Might Also Like</h2>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {suggestedEvents.map((event) => (
@@ -976,3 +956,4 @@ export default function Events() {
     </>
   );
 }
+

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useRef } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { FaUsers, FaCalendar, FaTicketAlt, FaDollarSign, FaUserTie, FaCheckCircle, FaEnvelope, FaChartLine, FaImage, FaPlus, FaEdit, FaTrash, FaTimes, FaSave, FaUpload, FaLink } from 'react-icons/fa';
+import { FaUsers, FaCalendar, FaTicketAlt, FaDollarSign, FaUserTie, FaCheckCircle, FaEnvelope, FaChartLine, FaImage, FaPlus, FaEdit, FaTrash, FaTimes, FaSave, FaUpload, FaLink, FaFileAlt } from 'react-icons/fa';
 import { API_URL } from '../config/api';
 import { useToast } from '../hooks/useToast';
 import ToastContainer from '../components/ToastContainer';
@@ -31,9 +31,19 @@ const AdminDashboard = () => {
   const [rejectModal, setRejectModal] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
 
+  // legal pages state
+  const [legalType, setLegalType] = useState('privacy');
+  const [legalData, setLegalData] = useState({ intro: '', sections: [], lastUpdated: '' });
+  const [legalLoading, setLegalLoading] = useState(false);
+  const [legalSaving, setLegalSaving] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'legal') fetchLegalPage(legalType);
+  }, [activeTab, legalType]);
 
   const fetchData = async () => {
     try {
@@ -59,6 +69,44 @@ const AdminDashboard = () => {
       showToast('❌ Failed to load dashboard data', 'error');
       setLoading(false);
     }
+  };
+
+  const fetchLegalPage = async (type) => {
+    setLegalLoading(true);
+    try {
+      const { data } = await axios.get(`${API_URL}/legal/${type}`, { headers: { Authorization: `Bearer ${user.token}` } });
+      setLegalData({ intro: data.intro || '', sections: data.sections || [], lastUpdated: data.lastUpdated || '' });
+    } catch {
+      showToast('❌ Failed to load legal page', 'error');
+    } finally {
+      setLegalLoading(false);
+    }
+  };
+
+  const saveLegalPage = async () => {
+    setLegalSaving(true);
+    try {
+      await axios.put(`${API_URL}/legal/${legalType}`, legalData, { headers: { Authorization: `Bearer ${user.token}` } });
+      showToast('✅ Legal page saved successfully', 'success');
+    } catch {
+      showToast('❌ Failed to save legal page', 'error');
+    } finally {
+      setLegalSaving(false);
+    }
+  };
+
+  const updateSection = (i, field, value) => {
+    const updated = [...legalData.sections];
+    updated[i] = { ...updated[i], [field]: value };
+    setLegalData(prev => ({ ...prev, sections: updated }));
+  };
+
+  const addSection = () => {
+    setLegalData(prev => ({ ...prev, sections: [...prev.sections, { title: '', content: '' }] }));
+  };
+
+  const removeSection = (i) => {
+    setLegalData(prev => ({ ...prev, sections: prev.sections.filter((_, idx) => idx !== i) }));
   };
 
   const handleRoleChange = async (userId, newRole) => {
@@ -282,7 +330,7 @@ const AdminDashboard = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
       <div className="container mx-auto px-4">
         {/* Header skeleton */}
         <div className="mb-8">
@@ -291,7 +339,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats skeleton */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="bg-white border border-gray-200 rounded-2xl p-4">
               <div className="flex items-center justify-between">
@@ -336,88 +384,88 @@ const AdminDashboard = () => {
 
   return (
     <>
-    <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
       <ToastContainer toasts={toasts} removeToast={removeToast} />
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-2xl sm:text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
             👑 Admin Dashboard
           </h1>
           <p className="text-gray-600">Manage users, events, and platform operations</p>
         </div>
 
       {/* Statistics Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1 font-semibold">Total Users</p>
               <p className="text-2xl font-bold text-gray-900">{stats?.totalUsers || 0}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
               <FaUsers className="text-white text-xl" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1 font-semibold">Organizers</p>
               <p className="text-2xl font-bold text-gray-900">{stats?.totalOrganizers || 0}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center">
               <FaUserTie className="text-white text-xl" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1 font-semibold">Total Events</p>
               <p className="text-2xl font-bold text-gray-900">{stats?.totalEvents || 0}</p>
               <p className="text-xs text-green-600 font-semibold">{stats?.publishedEvents || 0} published</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
               <FaCalendar className="text-white text-xl" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1 font-semibold">Pending</p>
               <p className="text-2xl font-bold text-gray-900">{stats?.pendingEvents || 0}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center">
               <FaChartLine className="text-white text-xl" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1 font-semibold">Bookings</p>
               <p className="text-2xl font-bold text-gray-900">{stats?.totalBookings || 0}</p>
               <p className="text-xs text-green-600 font-semibold">{stats?.confirmedBookings || 0} confirmed</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-pink-600 rounded-xl flex items-center justify-center">
               <FaTicketAlt className="text-white text-xl" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-600 text-sm mb-1 font-semibold">Revenue</p>
               <p className="text-2xl font-bold text-gray-900">₹{stats?.totalRevenue || 0}</p>
             </div>
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
               <FaDollarSign className="text-white text-xl" />
             </div>
           </div>
@@ -426,14 +474,14 @@ const AdminDashboard = () => {
 
       {/* Tabs */}
       <div className="mb-6">
-        <div className="flex gap-2 flex-wrap bg-white border border-gray-200 rounded-2xl p-2">
-          {['overview', 'users', 'organizers', 'events', 'reviews', 'contacts', 'slider'].map((tab) => (
+        <div className="flex gap-1 flex-wrap bg-white border border-gray-200 rounded-2xl p-2 overflow-x-auto">
+          {['overview', 'users', 'organizers', 'events', 'reviews', 'contacts', 'slider', 'legal'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 font-semibold capitalize rounded-xl transition-all ${
+              className={`px-3 sm:px-6 py-2 sm:py-3 text-sm font-semibold capitalize rounded-xl transition-colors ${
                 activeTab === tab
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
+                  ? 'bg-purple-600 text-white'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
@@ -540,21 +588,21 @@ const AdminDashboard = () => {
                           {u.suspended ? (
                             <button
                               onClick={() => handleUnsuspendUser(u._id)}
-                              className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-all text-sm font-semibold"
+                              className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-colors text-sm font-semibold"
                             >
                               Unsuspend
                             </button>
                           ) : (
                             <button
                               onClick={() => handleSuspendUser(u._id)}
-                              className="bg-yellow-600 text-white px-3 py-1 rounded-lg hover:bg-yellow-700 transition-all text-sm font-semibold"
+                              className="bg-yellow-600 text-white px-3 py-1 rounded-lg hover:bg-yellow-700 transition-colors text-sm font-semibold"
                             >
                               Suspend
                             </button>
                           )}
                           <button
                             onClick={() => handleDeleteUser(u._id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-all text-sm font-semibold"
+                            className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold"
                           >
                             Delete
                           </button>
@@ -604,14 +652,14 @@ const AdminDashboard = () => {
                         {org.suspended ? (
                           <button
                             onClick={() => handleUnsuspendUser(org._id)}
-                            className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-all text-sm font-semibold"
+                            className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-colors text-sm font-semibold"
                           >
                             Unsuspend
                           </button>
                         ) : (
                           <button
                             onClick={() => handleSuspendUser(org._id)}
-                            className="bg-yellow-600 text-white px-3 py-1 rounded-lg hover:bg-yellow-700 transition-all text-sm font-semibold"
+                            className="bg-yellow-600 text-white px-3 py-1 rounded-lg hover:bg-yellow-700 transition-colors text-sm font-semibold"
                           >
                             Suspend
                           </button>
@@ -673,7 +721,7 @@ const AdminDashboard = () => {
                         {event.status === 'draft' && (
                           <button
                             onClick={() => handleApproveEvent(event._id)}
-                            className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-all text-sm font-semibold"
+                            className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition-colors text-sm font-semibold"
                           >
                             Approve
                           </button>
@@ -681,14 +729,14 @@ const AdminDashboard = () => {
                         {event.status !== 'cancelled' && (
                           <button
                             onClick={() => handleRejectEvent(event._id)}
-                            className="bg-yellow-600 text-white px-3 py-1 rounded-lg hover:bg-yellow-700 transition-all text-sm font-semibold"
+                            className="bg-yellow-600 text-white px-3 py-1 rounded-lg hover:bg-yellow-700 transition-colors text-sm font-semibold"
                           >
                             Reject
                           </button>
                         )}
                         <button
                           onClick={() => handleDeleteEvent(event._id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-all text-sm font-semibold"
+                          className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold"
                         >
                           Delete
                         </button>
@@ -710,7 +758,7 @@ const AdminDashboard = () => {
           </h2>
           <div className="space-y-4">
             {reviews.map((review) => (
-              <div key={review._id} className="border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+              <div key={review._id} className="border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <div className="font-semibold text-gray-900">{review.user.name}</div>
@@ -725,7 +773,7 @@ const AdminDashboard = () => {
                   </div>
                   <button
                     onClick={() => handleDeleteReview(review._id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-all text-sm font-semibold"
+                    className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold"
                   >
                     Delete
                   </button>
@@ -749,7 +797,7 @@ const AdminDashboard = () => {
           <div className="space-y-4">
             {contacts && contacts.length > 0 ? (
               contacts.map((contact) => (
-                <div key={contact._id} className="border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-all">
+                <div key={contact._id} className="border border-gray-200 rounded-2xl p-4 hover:border-purple-300 transition-colors">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <div className="font-semibold text-gray-900">{contact.name}</div>
@@ -781,7 +829,7 @@ const AdminDashboard = () => {
                       </select>
                       <button
                         onClick={() => handleDeleteContact(contact._id)}
-                        className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-all text-sm font-semibold"
+                        className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold"
                       >
                         Delete
                       </button>
@@ -813,7 +861,7 @@ const AdminDashboard = () => {
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                 <FaImage className="text-purple-600" /> Hero Slider Management
               </h2>
-              <button onClick={openCreateSlide} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700">
+              <button onClick={openCreateSlide} className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700">
                 <FaPlus /> Add Slide
               </button>
             </div>
@@ -925,7 +973,7 @@ const AdminDashboard = () => {
                   </div>
 
                   <div className="flex gap-3 mt-6">
-                    <button onClick={handleSaveSlide} className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700">
+                    <button onClick={handleSaveSlide} className="flex-1 flex items-center justify-center gap-2 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700">
                       <FaSave /> {editingSlide ? 'Update Slide' : 'Create Slide'}
                     </button>
                     <button onClick={() => setShowSlideForm(false)} className="flex-1 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:border-gray-400">
@@ -976,13 +1024,103 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Legal Pages Tab */}
+      {activeTab === 'legal' && (
+        <div className="space-y-6">
+          {/* Type switcher */}
+          <div className="flex gap-3">
+            {['privacy', 'terms'].map(t => (
+              <button key={t} onClick={() => setLegalType(t)}
+                className={`px-6 py-2.5 rounded-xl font-semibold text-sm capitalize transition-colors ${legalType === t ? 'bg-purple-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-purple-400'}`}>
+                {t === 'privacy' ? '🔒 Privacy Policy' : '📄 Terms of Service'}
+              </button>
+            ))}
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <FaFileAlt className="text-purple-600" />
+                {legalType === 'privacy' ? 'Privacy Policy' : 'Terms of Service'}
+              </h2>
+              <button onClick={saveLegalPage} disabled={legalSaving}
+                className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 disabled:opacity-60 transition-colors">
+                <FaSave className="text-sm" /> {legalSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+
+            {legalLoading ? (
+              <div className="space-y-4 animate-pulse">
+                {[...Array(4)].map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-xl" />)}
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {/* Last Updated */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Last Updated Date</label>
+                  <input value={legalData.lastUpdated} onChange={e => setLegalData(p => ({ ...p, lastUpdated: e.target.value }))}
+                    placeholder="e.g. January 1, 2025"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 text-sm" />
+                </div>
+
+                {/* Intro */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Introduction Paragraph</label>
+                  <textarea value={legalData.intro} onChange={e => setLegalData(p => ({ ...p, intro: e.target.value }))}
+                    rows={3} placeholder="Brief intro shown at the top of the page..."
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 text-sm resize-none" />
+                </div>
+
+                {/* Sections */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-semibold text-gray-700">Sections</label>
+                    <button onClick={addSection}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-sm font-semibold hover:bg-purple-100 transition-colors">
+                      <FaPlus className="text-xs" /> Add Section
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {legalData.sections.map((section, i) => (
+                      <div key={i} className="border border-gray-200 rounded-xl p-4 relative">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">Section {i + 1}</span>
+                          <button onClick={() => removeSection(i)}
+                            className="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors">
+                            <FaTrash className="text-xs" />
+                          </button>
+                        </div>
+                        <input value={section.title} onChange={e => updateSection(i, 'title', e.target.value)}
+                          placeholder="Section title (e.g. 1. Information We Collect)"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400 mb-2" />
+                        <textarea value={section.content} onChange={e => updateSection(i, 'content', e.target.value)}
+                          rows={4} placeholder="Section content... (use • for bullets, new lines are preserved)"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400 resize-y" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button onClick={saveLegalPage} disabled={legalSaving}
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 disabled:opacity-60 transition-colors">
+                    <FaSave /> {legalSaving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       </div>
     </div>
 
       {/* Generic Confirm Modal */}
       {confirmModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md text-center">
+          <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md text-center">
             <div className="text-4xl mb-3">⚠️</div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">Are you sure?</h3>
             <p className="text-gray-500 text-sm mb-6">{confirmModal.message}</p>
@@ -1003,7 +1141,7 @@ const AdminDashboard = () => {
       {/* Reject Event Modal */}
       {rejectModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md">
+          <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Reject Event</h3>
             <p className="text-gray-500 text-sm mb-3">Provide a reason so the organizer knows what to fix.</p>
             <textarea
@@ -1031,3 +1169,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

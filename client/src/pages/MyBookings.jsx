@@ -113,7 +113,7 @@ const MyBookings = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center pt-28 bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen flex items-center justify-center pt-20 sm:pt-28 bg-gray-50">
       <div className="text-center">
         <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8 text-white animate-spin" fill="none" viewBox="0 0 24 24">
@@ -129,17 +129,17 @@ const MyBookings = () => {
   return (
     <>
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      <div className="min-h-screen pt-28 pb-12 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen pt-20 sm:pt-20 sm:pt-28 pb-8 sm:pb-12 bg-gray-50">
         <div className="container mx-auto px-4">
 
           {/* Header */}
-          <div className="mb-10">
+          <div className="mb-6 sm:mb-10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center">
                 <FaTicketAlt className="text-2xl text-white" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-                My <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Bookings</span>
+              <h1 className="text-3xl sm:text-4xl md:text-3xl sm:text-2xl sm:text-2xl sm:text-4xl md:text-5xl font-bold text-gray-900">
+                My <span className="bg-purple-600 bg-clip-text text-transparent">Bookings</span>
               </h1>
             </div>
             <p className="text-gray-600 text-lg">Manage and track all your event bookings</p>
@@ -147,7 +147,7 @@ const MyBookings = () => {
 
           {/* Stats */}
           {bookings.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6 sm:mb-10">
               {[
                 { label: 'Total', value: stats.total, color: 'text-gray-900' },
                 { label: 'Confirmed', value: stats.confirmed, color: 'text-green-600' },
@@ -157,7 +157,7 @@ const MyBookings = () => {
                 { label: 'Past', value: stats.past, color: 'text-purple-600' },
               ].map(s => (
                 <div key={s.label} className="bg-white border border-gray-200 rounded-xl p-5 text-center">
-                  <div className={`text-3xl font-bold mb-1 ${s.color}`}>{s.value}</div>
+                  <div className={`text-2xl sm:text-3xl font-bold mb-1 ${s.color}`}>{s.value}</div>
                   <div className="text-sm text-gray-600 font-medium">{s.label}</div>
                 </div>
               ))}
@@ -190,7 +190,7 @@ const MyBookings = () => {
               <p className="text-gray-900 text-2xl mb-2 font-semibold">{bookings.length === 0 ? 'No Bookings Yet' : 'No bookings found'}</p>
               <p className="text-gray-600 mb-8">{bookings.length === 0 ? 'Start exploring amazing events and book your tickets' : 'Try changing the filter'}</p>
               {bookings.length === 0 && (
-                <Link to="/events" className="inline-flex items-center gap-2 px-8 py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700">
+                <Link to="/events" className="inline-flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-4 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700">
                   <FaCalendar /> Browse Events
                 </Link>
               )}
@@ -201,7 +201,7 @@ const MyBookings = () => {
                 <div key={booking._id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 transition-colors">
 
                   {/* Card Header */}
-                  <div className="bg-gray-50 px-6 py-5 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="bg-gray-50 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-900 mb-1">{booking.event.title}</h3>
                       <div className="flex items-center gap-2 text-gray-500 text-sm">
@@ -223,7 +223,7 @@ const MyBookings = () => {
 
                   {/* Card Body */}
                   <div className="p-6">
-                    <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
 
                       {/* Event Details */}
                       <div className="space-y-4">
@@ -269,9 +269,9 @@ const MyBookings = () => {
                       {/* Payment */}
                       <div className="space-y-3">
                         <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Payment</h4>
-                        <div className={`rounded-xl p-4 border-2 ${booking.totalAmount === 0 ? 'bg-green-50 border-green-200' : 'bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200'}`}>
+                        <div className={`rounded-xl p-4 border-2 ${booking.totalAmount === 0 ? 'bg-green-50 border-green-200' : 'bg-purple-50 border-purple-200'}`}>
                           <p className="text-xs text-gray-500 mb-1">Total Amount</p>
-                          <p className={`text-3xl font-bold mb-2 ${booking.totalAmount === 0 ? 'text-green-700' : 'text-gray-900'}`}>
+                          <p className={`text-2xl sm:text-3xl font-bold mb-2 ${booking.totalAmount === 0 ? 'text-green-700' : 'text-gray-900'}`}>
                             {booking.totalAmount === 0 ? 'FREE' : `₹${booking.totalAmount}`}
                           </p>
                           <div className={`flex items-center gap-1.5 text-xs font-semibold ${booking.status === 'cancelled' ? 'text-red-600' : booking.totalAmount === 0 ? 'text-green-700' : 'text-green-600'}`}>
@@ -405,7 +405,7 @@ const MyBookings = () => {
                                 {[1,2,3,4,5].map(star => (
                                   <button key={star} type="button"
                                     onClick={() => setReviewData({ ...reviewData, [booking._id]: { ...reviewData[booking._id], rating: star } })}
-                                    className="hover:scale-110 transition-transform">
+                                    className="">
                                     <FaStar className={`text-2xl ${(reviewData[booking._id]?.rating || 0) >= star ? 'text-amber-400' : 'text-gray-300'}`} />
                                   </button>
                                 ))}
@@ -460,7 +460,7 @@ const MyBookings = () => {
       {/* Cancel Confirm Modal */}
       {confirmCancelId && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md">
+          <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-md">
             <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FaTimesCircle className="text-red-600 text-xl" />
             </div>
@@ -484,3 +484,4 @@ const MyBookings = () => {
 };
 
 export default MyBookings;
+

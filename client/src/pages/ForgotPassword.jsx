@@ -28,17 +28,17 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 pt-32 pb-12">
-      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 pt-32 pb-12">
+      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-6 sm:gap-8 items-center">
         {/* LEFT SIDE - BRANDING */}
         <div className="hidden lg:block">
-          <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-6">
+          <div className="w-20 h-20 bg-purple-600 rounded-2xl flex items-center justify-center mb-6">
             <FaCalendarAlt className="text-white text-4xl" />
           </div>
 
-          <h1 className="text-5xl font-bold mb-4 text-gray-900" style={{ fontFamily: "Poppins, sans-serif" }}>
+          <h1 className="text-3xl sm:text-2xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900" style={{ fontFamily: "Poppins, sans-serif" }}>
             {success ? 'Check Your' : 'Reset Your'}
-            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent block mt-2">
+            <span className="bg-purple-600 bg-clip-text text-transparent block mt-2">
               {success ? 'Email' : 'Password'}
             </span>
           </h1>
@@ -52,19 +52,19 @@ const ForgotPassword = () => {
 
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaCheckCircle className="text-white" />
               </div>
               <span className="text-gray-700 font-medium">Secure password reset</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaCheckCircle className="text-white" />
               </div>
               <span className="text-gray-700 font-medium">Link expires in 1 hour</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FaCheckCircle className="text-white" />
               </div>
               <span className="text-gray-700 font-medium">Email sent instantly</span>
@@ -74,14 +74,14 @@ const ForgotPassword = () => {
 
         {/* RIGHT SIDE - FORM */}
         <div className="w-full">
-          <div className="bg-white border border-gray-200 rounded-3xl p-8 md:p-10">
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-5 sm:p-8 md:p-10">
             {!success ? (
               <>
                 <div className="text-center mb-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <FaEnvelope className="text-white text-2xl" />
                   </div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Poppins, sans-serif" }}>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "Poppins, sans-serif" }}>
                     Forgot Password?
                   </h2>
                   <p className="text-gray-600">Enter your email to receive a reset link</p>
@@ -112,7 +112,7 @@ const ForgotPassword = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
@@ -143,10 +143,10 @@ const ForgotPassword = () => {
               </>
             ) : (
               <div className="text-center py-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <FaCheckCircle className="text-white text-4xl" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "Poppins, sans-serif" }}>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "Poppins, sans-serif" }}>
                   Check Your Email!
                 </h2>
                 <p className="text-gray-700 mb-4 text-lg">
@@ -167,7 +167,7 @@ const ForgotPassword = () => {
 
                 <Link
                   to="/login"
-                  className="inline-block w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700"
+                  className="inline-block w-full px-6 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700"
                 >
                   Back to Login
                 </Link>
@@ -193,3 +193,4 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+
